@@ -9,12 +9,12 @@ const TopBar = () => {
             <h2>YUMMY</h2>
             </Link>
         </div>
-        <div className="searchBar">
+{/*         <div className="searchBar">
             <input type="text" placeholder='Search...' />
         </div>
         <div className="userAuth">
             Login / SignUp
-        </div>
+        </div> */}
    </section>
   )
 }
