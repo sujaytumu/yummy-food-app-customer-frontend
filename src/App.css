@@ -315,3 +315,16 @@ body {
 .zoomEffect:hover {
     transform: scale(0.95);
 }
+/* NEW: cart bar + checkout modal (Razorpay) */
+.qtyControl { display: flex; justify-content: space-around; align-items: center; cursor: default; }
+.qtyControl span { cursor: pointer; padding: 0 6px; user-select: none; }
+.cartBar { position: fixed; bottom: 0; left: 0; right: 0; background: #60b246; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 14px 24px; z-index: 50; font-weight: 600; }
+.cartBar button { background: #fff; color: #60b246; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+.checkoutOverlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: flex; justify-content: center; align-items: center; z-index: 100; }
+.checkoutForm { background: #fff; padding: 24px; border-radius: 10px; width: min(92vw, 380px); display: flex; flex-direction: column; gap: 10px; }
+.checkoutForm input, .checkoutForm textarea { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font: inherit; }
+.checkoutTotal { font-weight: 700; }
+.checkoutBtns { display: flex; gap: 10px; }
+.checkoutBtns button { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.checkoutBtns button[type="submit"] { background: #e15b64; color: #fff; }
+.paidMsg { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: #60b246; color: #fff; padding: 12px 20px; border-radius: 8px; z-index: 60; }
