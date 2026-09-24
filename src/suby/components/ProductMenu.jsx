@@ -85,6 +85,8 @@ const ProductMenu = () => {
   const [customer, setCustomer] = useState({ name: "", phone: "", address: "" });
   const [paying, setPaying] = useState(false);
   const [paidMsg, setPaidMsg] = useState("");
+  // NEW: shown after a successful payment (order summary + PDF receipt link)
+  const [receipt, setReceipt] = useState(null);
 
   const { firmId, firmName } = useParams();
 
@@ -158,7 +160,21 @@ const ProductMenu = () => {
             });
             const verifyData = await verifyRes.json();
             if (!verifyRes.ok) throw new Error(verifyData.error || "Verification failed");
-            setPaidMsg(`Payment successful! Order id: ${verifyData.orderId}`);
+            // UPDATED: show a full success panel with the PDF receipt instead of a small toast
+            const snapshot = {
+              orderId: verifyData.orderId,
+              paymentId: verifyData.paymentId || response.razorpay_payment_id,
+              restaurant: firmName,
+              items: cartItems.map((p) => ({ name: p.productName, qty: cart[p._id], price: parsePrice(p.price) })),
+              total: totalPrice,
+              paidVia: "",
+            };
+            setReceipt(snapshot);
+            // best effort: fetch how it was paid (UPI/card/netbanking) for display
+            fetch(`${API_URL}/payment/order/${snapshot.orderId}?pid=${snapshot.paymentId}`)
+              .then((r) => (r.ok ? r.json() : null))
+              .then((d) => d && setReceipt((cur) => (cur ? { ...cur, paidVia: d.paymentDetail || d.paymentMethod || "" } : cur)))
+              .catch(() => {});
             setCart({});
             setShowCheckout(false);
           } catch (err) {
@@ -213,6 +229,38 @@ const ProductMenu = () => {
       {/* NEW: success message, cart bar and checkout form */}
       {paidMsg && <div className="paidMsg">{paidMsg}</div>}
 
+      {/* NEW: order confirmation with downloadable PDF receipt */}
+      {receipt && (
+        <div className="checkoutOverlay">
+          <div className="checkoutForm receiptBox">
+            <h3>✅ Payment successful</h3>
+            <div className="receiptMeta">Order #{String(receipt.orderId).slice(-8).toUpperCase()} · {receipt.restaurant}</div>
+            <div className="receiptItems">
+              {receipt.items.map((it, i) => (
+                <div key={i} className="receiptRow">
+                  <span>{it.name} × {it.qty}</span>
+                  <span>₹{(it.price * it.qty).toFixed(2)}</span>
+                </div>
+              ))}
+              <div className="receiptRow receiptTotal"><span>Total paid</span><span>₹{Number(receipt.total).toFixed(2)}</span></div>
+            </div>
+            <div className="receiptMeta">Payment ID: {receipt.paymentId}</div>
+            {receipt.paidVia && <div className="receiptMeta">Paid via: {receipt.paidVia}</div>}
+            <div className="checkoutBtns">
+              <button type="button" onClick={() => setReceipt(null)}>Close</button>
+              <a
+                className="receiptDownload"
+                href={`${API_URL}/payment/receipt/${receipt.orderId}?pid=${receipt.paymentId}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Download receipt (PDF)
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
       {totalQty > 0 && !showCheckout && (
         <div className="cartBar">
           <span>{totalQty} item(s) · ₹{totalPrice}</span>
@@ -231,6 +279,7 @@ const ProductMenu = () => {
             <textarea placeholder="Address" value={customer.address}
               onChange={(e) => setCustomer({ ...customer, address: e.target.value })} />
             <div className="checkoutTotal">Total: ₹{totalPrice}</div>
+            <div className="checkoutNote">Pay with UPI, Netbanking or Indian cards. International cards are not supported.</div>
             <div className="checkoutBtns">
               <button type="button" onClick={() => setShowCheckout(false)} disabled={paying}>Back</button>
               <button type="submit" disabled={paying}>{paying ? "Please wait..." : `Pay ₹${totalPrice}`}</button>
