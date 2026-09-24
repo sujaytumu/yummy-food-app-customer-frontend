@@ -328,3 +328,12 @@ body {
 .checkoutBtns button { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
 .checkoutBtns button[type="submit"] { background: #e15b64; color: #fff; }
 .paidMsg { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: #60b246; color: #fff; padding: 12px 20px; border-radius: 8px; z-index: 60; }
+
+/* NEW: success panel + payment note */
+.checkoutNote { font-size: 12px; color: #777; }
+.receiptBox { max-height: 90vh; overflow-y: auto; }
+.receiptMeta { font-size: 13px; color: #666; word-break: break-all; }
+.receiptItems { border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.receiptRow { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.receiptTotal { font-weight: 700; border-top: 1px dashed #ccc; padding-top: 6px; }
+.receiptDownload { flex: 1; text-align: center; padding: 10px; border-radius: 6px; background: #e15b64; color: #fff; font-weight: 600; text-decoration: none; }
