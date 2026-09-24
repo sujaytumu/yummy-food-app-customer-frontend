@@ -337,3 +337,13 @@ body {
 .receiptRow { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
 .receiptTotal { font-weight: 700; border-top: 1px dashed #ccc; padding-top: 6px; }
 .receiptDownload { flex: 1; text-align: center; padding: 10px; border-radius: 6px; background: #e15b64; color: #fff; font-weight: 600; text-decoration: none; }
+
+/* NEW: filters, My Orders, top bar link */
+.topBarLinks { display: flex; gap: 16px; font-weight: 600; }
+.menuFilters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 16px; }
+.menuFilters input { flex: 1 1 180px; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font: inherit; }
+.filterBtn { padding: 8px 14px; border: 1px solid #ccc; border-radius: 20px; background: #fff; cursor: pointer; font: inherit; }
+.filterBtn.active { background: #e15b64; color: #fff; border-color: #e15b64; }
+.cartClear { margin-left: auto; margin-right: 10px; background: transparent !important; color: #fff !important; border: 1px solid #fff !important; }
+.myOrderCard { border: 1px solid #eee; border-radius: 10px; padding: 14px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; max-width: 520px; }
+button.receiptDownload { border: none; cursor: pointer; font: inherit; }
