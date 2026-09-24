@@ -61,6 +61,22 @@ export const downloadReceipt = async (orderId, paymentId) => {
   }
 };
 
+// NEW: email the receipt PDF (backend sends it through Resend)
+export const emailReceipt = async (orderId, paymentId, email) => {
+  try {
+    const res = await fetch(`${API_URL}/payment/send-receipt`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId, pid: paymentId, email }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `Could not send email (status ${res.status})`);
+    return { ok: true, to: data.emailTo || email };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+};
+
 // Opens the PDF in a new tab (viewer)
 export const viewReceipt = (orderId, paymentId) => {
   window.open(receiptUrl(orderId, paymentId, true), "_blank", "noopener");

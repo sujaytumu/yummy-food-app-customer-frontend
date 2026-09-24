@@ -57,7 +57,7 @@ import React, { useState, useEffect } from "react";
 import { API_URL } from "../api";
 import { useParams } from "react-router-dom";
 import TopBar from "./TopBar";
-import { loadCart, saveCart, saveOrder, downloadReceipt, viewReceipt } from "../orderStore"; // NEW
+import { loadCart, saveCart, saveOrder, downloadReceipt, viewReceipt, emailReceipt } from "../orderStore"; // NEW
 
 // NEW: loads Razorpay Checkout script once
 const loadRazorpay = () =>
@@ -86,7 +86,9 @@ const ProductMenu = () => {
   const [search, setSearch] = useState("");
   const [foodType, setFoodType] = useState("all");
   const [showCheckout, setShowCheckout] = useState(false);
-  const [customer, setCustomer] = useState({ name: "", phone: "", address: "" });
+  const [customer, setCustomer] = useState({ name: "", phone: "", address: "", email: "" }); // UPDATED: email added
+  const [emailMsg, setEmailMsg] = useState(""); // NEW: status of the receipt email
+  const [emailBusy, setEmailBusy] = useState(false);
   const [paying, setPaying] = useState(false);
   const [paidMsg, setPaidMsg] = useState("");
   // NEW: shown after a successful payment (order summary + PDF receipt link)
@@ -147,6 +149,11 @@ const ProductMenu = () => {
       alert("Please fill name, phone and address");
       return;
     }
+    // NEW: email is asked at checkout so the receipt PDF can be mailed
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(customer.email.trim())) {
+      alert("Please enter a valid email address");
+      return;
+    }
     setPaying(true);
     try {
       const loaded = await loadRazorpay();
@@ -158,7 +165,7 @@ const ProductMenu = () => {
         body: JSON.stringify({
           firmId,
           items: cartItems.map((p) => ({ productId: p._id, qty: cart[p._id] })),
-          customer,
+          customer: { ...customer, email: customer.email.trim() },
         }),
       });
       const order = await res.json();
@@ -190,7 +197,13 @@ const ProductMenu = () => {
               items: cartItems.map((p) => ({ name: p.productName, qty: cart[p._id], price: parsePrice(p.price) })),
               total: totalPrice,
               paidVia: "",
+              email: customer.email.trim(),
             };
+            setEmailMsg(
+              verifyData.emailSent
+                ? `Receipt PDF emailed to ${verifyData.emailTo}`
+                : `Could not email the receipt${verifyData.emailError ? ": " + verifyData.emailError : ""}. You can still download it below.`
+            );
             setReceipt(snapshot);
             saveOrder(snapshot); // NEW: remember on this device for "My Orders"
             // best effort: fetch how it was paid (UPI/card/netbanking) for display
@@ -293,9 +306,24 @@ const ProductMenu = () => {
               <div className="receiptRow receiptTotal"><span>Total paid</span><span>₹{Number(receipt.total).toFixed(2)}</span></div>
             </div>
             <div className="receiptMeta">Payment ID: {receipt.paymentId}</div>
+            {emailMsg && <div className="receiptMeta emailMsg">{emailMsg}</div>}
             {receipt.paidVia && <div className="receiptMeta">Paid via: {receipt.paidVia}</div>}
             <div className="checkoutBtns">
               <button type="button" onClick={() => setReceipt(null)}>Close</button>
+              <button
+                type="button"
+                disabled={emailBusy}
+                onClick={async () => {
+                  const to = window.prompt("Send receipt PDF to which email?", receipt.email || customer.email || "");
+                  if (!to) return;
+                  setEmailBusy(true);
+                  const r = await emailReceipt(receipt.orderId, receipt.paymentId, to.trim());
+                  setEmailBusy(false);
+                  setEmailMsg(r.ok ? `Receipt PDF emailed to ${r.to}` : `Could not email: ${r.error}`);
+                }}
+              >
+                {emailBusy ? "Sending..." : "Email PDF"}
+              </button>
               <button type="button" onClick={() => viewReceipt(receipt.orderId, receipt.paymentId)}>View PDF</button>
               <button
                 type="button"
@@ -325,6 +353,8 @@ const ProductMenu = () => {
               onChange={(e) => setCustomer({ ...customer, name: e.target.value })} />
             <input placeholder="Phone" value={customer.phone}
               onChange={(e) => setCustomer({ ...customer, phone: e.target.value })} />
+            <input type="email" placeholder="Email (receipt PDF will be sent here)" value={customer.email}
+              onChange={(e) => setCustomer({ ...customer, email: e.target.value })} />
             <textarea placeholder="Address" value={customer.address}
               onChange={(e) => setCustomer({ ...customer, address: e.target.value })} />
             <div className="checkoutTotal">Total: ₹{totalPrice}</div>
