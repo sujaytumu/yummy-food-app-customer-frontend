@@ -69,6 +69,13 @@ const loadRazorpay = () =>
     document.body.appendChild(script);
   });
 
+// NEW: price is stored as a String in DB and can look like "₹80", "80/-" or "1,200".
+// Strip non-numeric chars before doing math so totals never become NaN.
+const parsePrice = (raw) => {
+  const n = parseFloat(String(raw ?? "").replace(/[^0-9.]/g, ""));
+  return Number.isFinite(n) ? n : 0;
+};
+
 const ProductMenu = () => {
   const [products, setProducts] = useState([]);
 
@@ -107,7 +114,7 @@ const ProductMenu = () => {
 
   const cartItems = products.filter((p) => cart[p._id]);
   const totalQty = cartItems.reduce((n, p) => n + cart[p._id], 0);
-  const totalPrice = cartItems.reduce((n, p) => n + Number(p.price) * cart[p._id], 0);
+  const totalPrice = cartItems.reduce((n, p) => n + parsePrice(p.price) * cart[p._id], 0);
 
   // NEW: Razorpay payment flow (create order -> open checkout -> verify on backend)
   const handlePayment = async (e) => {
