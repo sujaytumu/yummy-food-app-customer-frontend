@@ -347,3 +347,4 @@ body {
 .cartClear { margin-left: auto; margin-right: 10px; background: transparent !important; color: #fff !important; border: 1px solid #fff !important; }
 .myOrderCard { border: 1px solid #eee; border-radius: 10px; padding: 14px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; max-width: 520px; }
 button.receiptDownload { border: none; cursor: pointer; font: inherit; }
+.emailMsg { font-weight: 600; }
