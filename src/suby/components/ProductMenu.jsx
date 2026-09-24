@@ -57,6 +57,7 @@ import React, { useState, useEffect } from "react";
 import { API_URL } from "../api";
 import { useParams } from "react-router-dom";
 import TopBar from "./TopBar";
+import { loadCart, saveCart, saveOrder, downloadReceipt, viewReceipt } from "../orderStore"; // NEW
 
 // NEW: loads Razorpay Checkout script once
 const loadRazorpay = () =>
@@ -81,6 +82,9 @@ const ProductMenu = () => {
 
   // NEW: cart = { [productId]: qty }, checkout form + status
   const [cart, setCart] = useState({});
+  // NEW: menu search + veg / non-veg filter
+  const [search, setSearch] = useState("");
+  const [foodType, setFoodType] = useState("all");
   const [showCheckout, setShowCheckout] = useState(false);
   const [customer, setCustomer] = useState({ name: "", phone: "", address: "" });
   const [paying, setPaying] = useState(false);
@@ -113,6 +117,24 @@ const ProductMenu = () => {
       else delete next[id];
       return next;
     });
+
+  // NEW: keep the cart across refreshes (per restaurant)
+  useEffect(() => {
+    setCart(loadCart(firmId));
+  }, [firmId]);
+  useEffect(() => {
+    saveCart(firmId, cart);
+  }, [firmId, cart]);
+
+  const clearCart = () => setCart({});
+
+  // NEW: filtered menu
+  const visibleProducts = products.filter((p) => {
+    const matchesSearch = !search.trim() || String(p.productName).toLowerCase().includes(search.trim().toLowerCase());
+    const cats = Array.isArray(p.category) ? p.category : [];
+    const matchesType = foodType === "all" || cats.includes(foodType);
+    return matchesSearch && matchesType;
+  });
 
   const cartItems = products.filter((p) => cart[p._id]);
   const totalQty = cartItems.reduce((n, p) => n + cart[p._id], 0);
@@ -170,10 +192,16 @@ const ProductMenu = () => {
               paidVia: "",
             };
             setReceipt(snapshot);
+            saveOrder(snapshot); // NEW: remember on this device for "My Orders"
             // best effort: fetch how it was paid (UPI/card/netbanking) for display
             fetch(`${API_URL}/payment/order/${snapshot.orderId}?pid=${snapshot.paymentId}`)
               .then((r) => (r.ok ? r.json() : null))
-              .then((d) => d && setReceipt((cur) => (cur ? { ...cur, paidVia: d.paymentDetail || d.paymentMethod || "" } : cur)))
+              .then((d) => {
+                if (!d) return;
+                const via = d.paymentDetail || d.paymentMethod || "";
+                setReceipt((cur) => (cur ? { ...cur, paidVia: via } : cur));
+                saveOrder({ ...snapshot, paidVia: via });
+              })
               .catch(() => {});
             setCart({});
             setShowCheckout(false);
@@ -202,7 +230,27 @@ const ProductMenu = () => {
       <TopBar />
       <section className="productSection">
         <h3>{firmName}</h3>
-        {products.map((item) => (
+        {/* NEW: search and veg / non-veg filter */}
+        <div className="menuFilters">
+          <input
+            type="text"
+            placeholder="Search dishes..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {["all", "veg", "non-veg"].map((t) => (
+            <button
+              key={t}
+              type="button"
+              className={foodType === t ? "filterBtn active" : "filterBtn"}
+              onClick={() => setFoodType(t)}
+            >
+              {t === "all" ? "All" : t === "veg" ? "Veg" : "Non-veg"}
+            </button>
+          ))}
+        </div>
+        {products.length > 0 && visibleProducts.length === 0 && <p>No dishes match your search.</p>}
+        {visibleProducts.map((item) => (
           <div className="productBox" key={item._id}> {/* ✅ key added */}
             <div>
               <div><strong>{item.productName}</strong></div>
@@ -248,14 +296,14 @@ const ProductMenu = () => {
             {receipt.paidVia && <div className="receiptMeta">Paid via: {receipt.paidVia}</div>}
             <div className="checkoutBtns">
               <button type="button" onClick={() => setReceipt(null)}>Close</button>
-              <a
+              <button type="button" onClick={() => viewReceipt(receipt.orderId, receipt.paymentId)}>View PDF</button>
+              <button
+                type="button"
                 className="receiptDownload"
-                href={`${API_URL}/payment/receipt/${receipt.orderId}?pid=${receipt.paymentId}`}
-                target="_blank"
-                rel="noreferrer"
+                onClick={() => downloadReceipt(receipt.orderId, receipt.paymentId)}
               >
-                Download receipt (PDF)
-              </a>
+                Download PDF
+              </button>
             </div>
           </div>
         </div>
@@ -264,6 +312,7 @@ const ProductMenu = () => {
       {totalQty > 0 && !showCheckout && (
         <div className="cartBar">
           <span>{totalQty} item(s) · ₹{totalPrice}</span>
+          <button className="cartClear" onClick={clearCart}>Clear</button>
           <button onClick={() => { setPaidMsg(""); setShowCheckout(true); }}>Checkout</button>
         </div>
       )}
