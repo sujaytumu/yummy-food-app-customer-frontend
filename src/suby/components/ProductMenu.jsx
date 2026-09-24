@@ -39,16 +39,7 @@
 //               <div className="productGroup">
 //                 {/* <img src={`${API_URL}/uploads/${item.image}`} /> */}
 //                 <img src={item.image} alt={item.productName} />
-//                 {/* UPDATED: ADD button now adds to cart, shows -/qty/+ once added */}
-              {cart[item._id] ? (
-                <div className="addButton qtyControl">
-                  <span onClick={() => removeFromCart(item._id)}>−</span>
-                  <span>{cart[item._id]}</span>
-                  <span onClick={() => addToCart(item._id)}>+</span>
-                </div>
-              ) : (
-                <div className="addButton" onClick={() => addToCart(item._id)}>ADD</div>
-              )}
+//                 <div className="addButton">ADD</div>
 //               </div>
 //             </div>
 //           );
