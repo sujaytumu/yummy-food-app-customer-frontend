@@ -81,3 +81,15 @@ export const emailReceipt = async (orderId, paymentId, email) => {
 export const viewReceipt = (orderId, paymentId) => {
   window.open(receiptUrl(orderId, paymentId, true), "_blank", "noopener");
 };
+
+// NEW: live delivery status for one order (public endpoint, needs the payment id)
+export const fetchTracking = async (orderId, paymentId) => {
+  try {
+    const res = await fetch(`${API_URL}/payment/track/${orderId}?pid=${encodeURIComponent(paymentId)}`);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `Could not load status (${res.status})`);
+    return { ok: true, ...data };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+};

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import TopBar from "../components/TopBar";
+import OrderTracker from "../components/OrderTracker";
 import { loadOrders, downloadReceipt, viewReceipt, emailReceipt } from "../orderStore";
 
 // NEW: orders paid from this browser, with receipt download
@@ -28,6 +29,7 @@ const MyOrders = () => {
               <div className="receiptRow receiptTotal"><span>Total paid</span><span>₹{Number(o.total).toFixed(2)}</span></div>
             </div>
             {o.paidVia && <div className="receiptMeta">Paid via: {o.paidVia}</div>}
+            {o.paymentId && <OrderTracker orderId={o.orderId} paymentId={o.paymentId} />}
             <div className="checkoutBtns">
               <button type="button" onClick={() => viewReceipt(o.orderId, o.paymentId)}>View PDF</button>
               <button
