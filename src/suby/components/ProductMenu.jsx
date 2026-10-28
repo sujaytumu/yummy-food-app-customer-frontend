@@ -57,6 +57,7 @@ import React, { useState, useEffect } from "react";
 import { API_URL } from "../api";
 import { useParams } from "react-router-dom";
 import TopBar from "./TopBar";
+import { Link } from "react-router-dom";
 import { loadCart, saveCart, saveOrder, downloadReceipt, viewReceipt, emailReceipt } from "../orderStore"; // NEW
 
 // NEW: loads Razorpay Checkout script once
@@ -130,6 +131,18 @@ const ProductMenu = () => {
 
   const clearCart = () => setCart({});
 
+  // Drop dishes that went out of stock since they were added to the cart
+  useEffect(() => {
+    const outIds = products.filter((p) => p.inStock === false).map((p) => p._id);
+    if (outIds.some((id) => cart[id])) {
+      setCart((c) => {
+        const next = { ...c };
+        outIds.forEach((id) => delete next[id]);
+        return next;
+      });
+    }
+  }, [products]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // NEW: filtered menu
   const visibleProducts = products.filter((p) => {
     const matchesSearch = !search.trim() || String(p.productName).toLowerCase().includes(search.trim().toLowerCase());
@@ -138,7 +151,9 @@ const ProductMenu = () => {
     return matchesSearch && matchesType;
   });
 
-  const cartItems = products.filter((p) => cart[p._id]);
+  // Vendors can mark a dish out of stock; those can never be in the cart (missing flag = in stock)
+  const isOut = (p) => p.inStock === false;
+  const cartItems = products.filter((p) => cart[p._id] && !isOut(p));
   const totalQty = cartItems.reduce((n, p) => n + cart[p._id], 0);
   const totalPrice = cartItems.reduce((n, p) => n + parsePrice(p.price) * cart[p._id], 0);
 
@@ -264,7 +279,7 @@ const ProductMenu = () => {
         </div>
         {products.length > 0 && visibleProducts.length === 0 && <p>No dishes match your search.</p>}
         {visibleProducts.map((item) => (
-          <div className="productBox" key={item._id}> {/* ✅ key added */}
+          <div className="productBox" key={item._id} style={isOut(item) ? { opacity: 0.6 } : undefined}> {/* ✅ key added */}
             <div>
               <div><strong>{item.productName}</strong></div>
               <div>₹{item.price}</div>
@@ -273,7 +288,9 @@ const ProductMenu = () => {
             <div className="productGroup">
               <img src={item.image} alt={item.productName} /> {/* ✅ Cloudinary URL */}
               {/* UPDATED: ADD button now adds to cart, shows -/qty/+ once added */}
-              {cart[item._id] ? (
+              {isOut(item) ? (
+                <div className="addButton" style={{ background: "#ccc", color: "#555", cursor: "not-allowed" }}>Out of stock</div>
+              ) : cart[item._id] ? (
                 <div className="addButton qtyControl">
                   <span onClick={() => removeFromCart(item._id)}>−</span>
                   <span>{cart[item._id]}</span>
@@ -306,6 +323,7 @@ const ProductMenu = () => {
               <div className="receiptRow receiptTotal"><span>Total paid</span><span>₹{Number(receipt.total).toFixed(2)}</span></div>
             </div>
             <div className="receiptMeta">Payment ID: {receipt.paymentId}</div>
+            <Link to={`/order/${receipt.orderId}?pid=${encodeURIComponent(receipt.paymentId)}`}>Track this order live →</Link>
             {emailMsg && <div className="receiptMeta emailMsg">{emailMsg}</div>}
             {receipt.paidVia && <div className="receiptMeta">Paid via: {receipt.paidVia}</div>}
             <div className="checkoutBtns">

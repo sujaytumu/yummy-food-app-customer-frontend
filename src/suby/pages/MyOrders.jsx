@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import TopBar from "../components/TopBar";
 import OrderTracker from "../components/OrderTracker";
 import { loadOrders, downloadReceipt, viewReceipt, emailReceipt } from "../orderStore";
@@ -31,6 +32,9 @@ const MyOrders = () => {
             {o.paidVia && <div className="receiptMeta">Paid via: {o.paidVia}</div>}
             {o.paymentId && <OrderTracker orderId={o.orderId} paymentId={o.paymentId} />}
             <div className="checkoutBtns">
+              {o.paymentId && (
+                <Link className="receiptDownload" to={`/order/${o.orderId}?pid=${encodeURIComponent(o.paymentId)}`}>Track live</Link>
+              )}
               <button type="button" onClick={() => viewReceipt(o.orderId, o.paymentId)}>View PDF</button>
               <button
                 type="button"
