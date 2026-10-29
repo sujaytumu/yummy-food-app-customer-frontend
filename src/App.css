@@ -543,3 +543,19 @@ button { font-family: inherit; }
 .trackerStep.current .trackerDot { box-shadow: 0 0 0 5px var(--sage-light); }
 .trackerLabel { font-size: 11px; font-weight: 600; color: var(--ink-soft); }
 .trackerStep.current .trackerLabel { color: var(--sage); font-weight: 700; }
+
+/* Reviews, favorites, address book */
+.ratingTag { font-size: 13px; font-weight: 600; color: var(--gold-dark); }
+.reviewBox { border-top: 1px dashed var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 10px; }
+.reviewBox h4 { margin: 0; }
+.reviewRow { display: flex; flex-direction: column; gap: 6px; }
+.reviewRow textarea { border: 1px solid var(--line); border-radius: 6px; padding: 8px; font: inherit; min-height: 54px; }
+.reviewRow button { align-self: flex-start; padding: 8px 14px; border: none; border-radius: 6px; background: var(--brand); color: var(--surface); font-weight: 600; cursor: pointer; }
+.firmGroup { position: relative; }
+.favBtn { position: absolute; top: 8px; left: 8px; width: 34px; height: 34px; border-radius: 50%; border: none; background: rgba(255,255,255,0.92); font-size: 20px; line-height: 1; cursor: pointer; color: var(--ink-soft); }
+.favBtn.active { color: var(--brand); }
+.savedAddresses { display: flex; flex-direction: column; gap: 6px; }
+.savedAddr { display: flex; gap: 6px; }
+.savedAddr button { padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); cursor: pointer; text-align: left; font: inherit; font-size: 13px; }
+.savedAddr button:first-child { flex: 1; }
+.saveAddrRow { font-size: 14px; display: flex; gap: 6px; align-items: center; }

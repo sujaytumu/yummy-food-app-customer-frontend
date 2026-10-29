@@ -3,7 +3,7 @@ import { API_URL } from "../api";
 
 // NEW: shows live delivery status for one order, polling the backend every 15s.
 // Stops polling once the order is delivered, or if the component unmounts.
-const OrderTracker = ({ orderId, paymentId }) => {
+const OrderTracker = ({ orderId, paymentId, onStatus }) => {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const timerRef = useRef(null);
@@ -14,6 +14,7 @@ const OrderTracker = ({ orderId, paymentId }) => {
       const d = await res.json();
       if (!res.ok) throw new Error(d.error || "Could not load status");
       setData(d);
+      if (onStatus) onStatus(d.deliveryStatus);
       setError("");
     } catch (err) {
       setError(err.message);

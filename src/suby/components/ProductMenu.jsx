@@ -58,7 +58,10 @@ import { API_URL } from "../api";
 import { useParams } from "react-router-dom";
 import TopBar from "./TopBar";
 import { Link } from "react-router-dom";
-import { loadCart, saveCart, saveOrder, downloadReceipt, viewReceipt, emailReceipt } from "../orderStore"; // NEW
+import {
+  loadCart, saveCart, saveOrder, downloadReceipt, viewReceipt, emailReceipt,
+  fetchFirmRatings, loadAddresses, saveAddress, deleteAddress,
+} from "../orderStore"; // NEW
 import OrderTracker from "./OrderTracker"; // NEW
 
 // NEW: loads Razorpay Checkout script once
@@ -91,6 +94,11 @@ const ProductMenu = () => {
   const [customer, setCustomer] = useState({ name: "", phone: "", address: "", email: "" }); // UPDATED: email added
   const [emailMsg, setEmailMsg] = useState(""); // NEW: status of the receipt email
   const [emailBusy, setEmailBusy] = useState(false);
+  // Ratings from delivered-order reviews, and the device-local address book
+  const [ratings, setRatings] = useState({ ratings: {}, firm: { avg: 0, count: 0 } });
+  const [addresses, setAddresses] = useState(loadAddresses);
+  const [addrLabel, setAddrLabel] = useState("");
+  const [saveAddr, setSaveAddr] = useState(true);
   const [paying, setPaying] = useState(false);
   const [paidMsg, setPaidMsg] = useState("");
   // NEW: shown after a successful payment (order summary + PDF receipt link)
@@ -110,6 +118,7 @@ const ProductMenu = () => {
 
   useEffect(() => {
     productHandler();
+    fetchFirmRatings(firmId).then(setRatings);
   }, []);
 
   // NEW: cart helpers
@@ -169,6 +178,14 @@ const ProductMenu = () => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(customer.email.trim())) {
       alert("Please enter a valid email address");
       return;
+    }
+    if (saveAddr) {
+      setAddresses(
+        saveAddress({
+          label: addrLabel.trim() || "Saved address",
+          name: customer.name, phone: customer.phone, email: customer.email.trim(), address: customer.address,
+        })
+      );
     }
     setPaying(true);
     try {
@@ -258,7 +275,12 @@ const ProductMenu = () => {
     <>
       <TopBar />
       <section className="productSection">
-        <h3>{firmName}</h3>
+        <h3>
+          {firmName}
+          {ratings.firm.count > 0 && (
+            <span className="ratingTag"> ★ {ratings.firm.avg} ({ratings.firm.count})</span>
+          )}
+        </h3>
         {/* NEW: search and veg / non-veg filter */}
         <div className="menuFilters">
           <input
@@ -283,6 +305,9 @@ const ProductMenu = () => {
           <div className="productBox" key={item._id} style={isOut(item) ? { opacity: 0.6 } : undefined}> {/* ✅ key added */}
             <div>
               <div><strong>{item.productName}</strong></div>
+              {ratings.ratings[item._id] && (
+                <div className="ratingTag">★ {ratings.ratings[item._id].avg} ({ratings.ratings[item._id].count})</div>
+              )}
               <div>₹{item.price}</div>
               <div>{item.description}</div>
             </div>
@@ -362,7 +387,19 @@ const ProductMenu = () => {
         <div className="cartBar">
           <span>{totalQty} item(s) · ₹{totalPrice}</span>
           <button className="cartClear" onClick={clearCart}>Clear</button>
-          <button onClick={() => { setPaidMsg(""); setShowCheckout(true); }}>Checkout</button>
+          <button
+            onClick={() => {
+              setPaidMsg("");
+              // prefill from the most recently used saved address if the form is still empty
+              if (!customer.name && !customer.address && addresses[0]) {
+                const a = addresses[0];
+                setCustomer({ name: a.name || "", phone: a.phone || "", email: a.email || "", address: a.address || "" });
+              }
+              setShowCheckout(true);
+            }}
+          >
+            Checkout
+          </button>
         </div>
       )}
 
@@ -370,6 +407,22 @@ const ProductMenu = () => {
         <div className="checkoutOverlay">
           <form className="checkoutForm" onSubmit={handlePayment}>
             <h3>Delivery details</h3>
+            {addresses.length > 0 && (
+              <div className="savedAddresses">
+                <div className="receiptMeta">Saved addresses</div>
+                {addresses.map((a) => (
+                  <div className="savedAddr" key={a.id}>
+                    <button
+                      type="button"
+                      onClick={() => setCustomer({ name: a.name || "", phone: a.phone || "", email: a.email || "", address: a.address || "" })}
+                    >
+                      <strong>{a.label}</strong> — {a.address}
+                    </button>
+                    <button type="button" aria-label={`Delete ${a.label}`} onClick={() => setAddresses(deleteAddress(a.id))}>✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
             <input placeholder="Name" value={customer.name}
               onChange={(e) => setCustomer({ ...customer, name: e.target.value })} />
             <input placeholder="Phone" value={customer.phone}
@@ -378,6 +431,12 @@ const ProductMenu = () => {
               onChange={(e) => setCustomer({ ...customer, email: e.target.value })} />
             <textarea placeholder="Address" value={customer.address}
               onChange={(e) => setCustomer({ ...customer, address: e.target.value })} />
+            <label className="saveAddrRow">
+              <input type="checkbox" checked={saveAddr} onChange={(e) => setSaveAddr(e.target.checked)} /> Save this address for next time
+            </label>
+            {saveAddr && (
+              <input placeholder="Label (e.g. Home, Work)" value={addrLabel} maxLength={20} onChange={(e) => setAddrLabel(e.target.value)} />
+            )}
             <div className="checkoutTotal">Total: ₹{totalPrice}</div>
             <div className="checkoutNote">Pay with UPI, Netbanking or Indian cards. International cards are not supported.</div>
             <div className="checkoutBtns">
