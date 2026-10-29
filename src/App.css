@@ -360,3 +360,19 @@ button.receiptDownload { border: none; cursor: pointer; font: inherit; }
 .trackerDot { width: 22px; height: 22px; border-radius: 50%; background: #ddd; color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; margin-bottom: 4px; }
 .trackerSteps li.done .trackerDot, .trackerSteps li.current .trackerDot { background: #e15b64; }
 .trackerSteps li.current { color: #222; font-weight: 600; }
+
+/* Reviews, favorites, address book */
+.ratingTag { font-size: 13px; font-weight: 600; color: #b8860b; }
+.reviewBox { border-top: 1px dashed #eee; padding-top: 10px; display: flex; flex-direction: column; gap: 10px; }
+.reviewBox h4 { margin: 0; }
+.reviewRow { display: flex; flex-direction: column; gap: 6px; }
+.reviewRow textarea { border: 1px solid #ddd; border-radius: 6px; padding: 8px; font: inherit; min-height: 54px; }
+.reviewRow button { align-self: flex-start; padding: 8px 14px; border: none; border-radius: 6px; background: #e15b64; color: #fff; font-weight: 600; cursor: pointer; }
+.firmGroup { position: relative; }
+.favBtn { position: absolute; top: 8px; left: 8px; width: 34px; height: 34px; border-radius: 50%; border: none; background: rgba(255,255,255,0.92); font-size: 20px; line-height: 1; cursor: pointer; color: #666; }
+.favBtn.active { color: #e15b64; }
+.savedAddresses { display: flex; flex-direction: column; gap: 6px; }
+.savedAddr { display: flex; gap: 6px; }
+.savedAddr button { padding: 8px; border: 1px solid #ddd; border-radius: 6px; background: #fafafa; cursor: pointer; text-align: left; font: inherit; font-size: 13px; }
+.savedAddr button:first-child { flex: 1; }
+.saveAddrRow { font-size: 14px; display: flex; gap: 6px; align-items: center; }

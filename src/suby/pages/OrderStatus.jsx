@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import TopBar from "../components/TopBar";
 import OrderTracker from "../components/OrderTracker";
+import ReviewItems from "../components/ReviewItems";
 import { API_URL } from "../api";
 
 // NEW: dedicated live order page (/order/:orderId?pid=...). The tracker inside auto-refreshes.
@@ -11,6 +12,7 @@ const OrderStatus = () => {
   const pid = params.get("pid") || "";
   const [order, setOrder] = useState(null);
   const [error, setError] = useState("");
+  const [liveStatus, setLiveStatus] = useState("");
 
   useEffect(() => {
     if (!pid) {
@@ -42,7 +44,7 @@ const OrderStatus = () => {
             <div className="receiptMeta">
               {order.restaurant} · {new Date(order.paidAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
             </div>
-            <OrderTracker orderId={orderId} paymentId={pid} />
+            <OrderTracker orderId={orderId} paymentId={pid} onStatus={setLiveStatus} />
             <div className="receiptItems">
               {order.items.map((it, i) => (
                 <div key={i} className="receiptRow">
@@ -52,6 +54,9 @@ const OrderStatus = () => {
               ))}
               <div className="receiptRow receiptTotal"><span>Total paid</span><span>₹{Number(order.amount).toFixed(2)}</span></div>
             </div>
+            {(liveStatus || order.deliveryStatus) === "delivered" && (
+              <ReviewItems orderId={orderId} paymentId={pid} items={order.items} />
+            )}
             {order.statusHistory?.length > 0 && (
               <div className="receiptMeta">
                 {order.statusHistory.map((h, i) => (

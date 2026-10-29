@@ -76,11 +76,14 @@
 import React, { useState, useEffect } from "react";
 import { API_URL } from "../api";
 import { Link } from "react-router-dom";
+import { loadFavorites, toggleFavorite } from "../orderStore";
 
 const FirmCollections = () => {
   const [firmData, setFirmData] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState('All');
   const [activeCategory, setActiveCategory]= useState('all');
+  const [favorites, setFavorites] = useState(loadFavorites); // device-local
+  const [onlyFavorites, setOnlyFavorites] = useState(false);
 
   const firmDataHandler = async () => {
     try {
@@ -111,13 +114,15 @@ const FirmCollections = () => {
         <button onClick={() => filterHandler("North-Indian", 'north-indian')} className={activeCategory === 'north-indian' ? 'activeButton': ''} >North-Indian</button>
         <button onClick={() => filterHandler("Chinese", 'chinese')} className={activeCategory === 'chinese' ? 'activeButton': ''} >Chinese</button>
         <button onClick={() => filterHandler("Bakery", 'bakery')} className={activeCategory === 'bakery' ? 'activeButton': ''} >Bakery</button>
+        <button onClick={() => setOnlyFavorites((v) => !v)} className={onlyFavorites ? 'activeButton' : ''}>♥ Favorites ({favorites.length})</button>
       </div>
       <section className="firmSection">
         {firmData.map((apple) => (
           <React.Fragment key={apple._id || apple.firm[0]?._id}>
             {apple.firm.map((item) => {
-              if(selectedRegion === "All" || 
-                 item.region.map(r => r.toLowerCase()).includes(selectedRegion.toLowerCase())
+              if((selectedRegion === "All" || 
+                 item.region.map(r => r.toLowerCase()).includes(selectedRegion.toLowerCase())) &&
+                 (!onlyFavorites || favorites.includes(item._id))
               ){
                 return (
                   <Link to={`/products/${item._id}/${item.firmName}`} className="link" key={item._id}>
@@ -126,6 +131,14 @@ const FirmCollections = () => {
                         <div className="firmGroup">
                           <img src={item.image} alt={item.firmName} /> {/* ✅ Cloudinary URL */}
                           <div className="firmOffer">{item.offer}</div>
+                          <button
+                            type="button"
+                            className={favorites.includes(item._id) ? "favBtn active" : "favBtn"}
+                            aria-label={favorites.includes(item._id) ? "Remove from favorites" : "Add to favorites"}
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setFavorites(toggleFavorite(item._id)); }}
+                          >
+                            {favorites.includes(item._id) ? "♥" : "♡"}
+                          </button>
                         </div>
                         <div className="firmDetails">
                           <strong>{item.firmName}</strong>
@@ -142,6 +155,7 @@ const FirmCollections = () => {
             })}
           </React.Fragment>
         ))}
+        {onlyFavorites && favorites.length === 0 && <p>No favorites yet. Tap ♡ on a restaurant to save it.</p>}
       </section>
     </>
   );

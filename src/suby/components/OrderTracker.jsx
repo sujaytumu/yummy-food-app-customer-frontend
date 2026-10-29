@@ -10,7 +10,7 @@ const DEFAULT_STEPS = [
 const POLL_MS = 10000;
 
 // NEW: placed -> preparing -> out for delivery -> delivered. Polls until delivered.
-const OrderTracker = ({ orderId, paymentId }) => {
+const OrderTracker = ({ orderId, paymentId, onStatus }) => {
   const [track, setTrack] = useState(null);
   const [error, setError] = useState("");
 
@@ -22,6 +22,7 @@ const OrderTracker = ({ orderId, paymentId }) => {
       if (cancelled) return;
       if (r.ok) {
         setTrack(r);
+        if (onStatus) onStatus(r.deliveryStatus);
         setError("");
         if (r.deliveryStatus !== "delivered" && !document.hidden) timer = setTimeout(load, POLL_MS);
         else if (r.deliveryStatus !== "delivered") timer = setTimeout(load, POLL_MS * 3);
@@ -35,7 +36,7 @@ const OrderTracker = ({ orderId, paymentId }) => {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [orderId, paymentId]);
+  }, [orderId, paymentId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!track) return <div className="receiptMeta">{error || "Loading status..."}</div>;
 

@@ -93,3 +93,64 @@ export const fetchTracking = async (orderId, paymentId) => {
     return { ok: false, error: err.message };
   }
 };
+
+// ---- favorite restaurants (kept on this device; there are no customer accounts)
+export const loadFavorites = () => safeGet("yummyFavorites", []);
+export const toggleFavorite = (firmId) => {
+  const list = loadFavorites();
+  const next = list.includes(firmId) ? list.filter((id) => id !== firmId) : [...list, firmId];
+  safeSet("yummyFavorites", next);
+  return next;
+};
+
+// ---- address book (kept on this device)
+export const loadAddresses = () => safeGet("yummyAddresses", []);
+export const saveAddress = (entry) => {
+  const key = (a) => `${a.address}`.trim().toLowerCase();
+  const list = loadAddresses().filter((a) => key(a) !== key(entry));
+  list.unshift({ ...entry, id: entry.id || String(Date.now()) });
+  safeSet("yummyAddresses", list.slice(0, 10));
+  return loadAddresses();
+};
+export const deleteAddress = (id) => {
+  safeSet("yummyAddresses", loadAddresses().filter((a) => a.id !== id));
+  return loadAddresses();
+};
+
+// ---- reviews
+const jsonOrEmpty = (res) => res.json().catch(() => ({}));
+
+export const fetchFirmRatings = async (firmId) => {
+  try {
+    const res = await fetch(`${API_URL}/review/firm/${firmId}`);
+    if (!res.ok) return { ratings: {}, firm: { avg: 0, count: 0 } };
+    return await res.json();
+  } catch {
+    return { ratings: {}, firm: { avg: 0, count: 0 } };
+  }
+};
+
+export const fetchOrderReviews = async (orderId, paymentId) => {
+  try {
+    const res = await fetch(`${API_URL}/review/order/${orderId}?pid=${encodeURIComponent(paymentId)}`);
+    const data = await jsonOrEmpty(res);
+    return res.ok ? data.reviews || [] : [];
+  } catch {
+    return [];
+  }
+};
+
+export const submitReview = async ({ orderId, paymentId, productId, rating, comment }) => {
+  try {
+    const res = await fetch(`${API_URL}/review`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId, pid: paymentId, productId, rating, comment }),
+    });
+    const data = await jsonOrEmpty(res);
+    if (!res.ok) throw new Error(data.error || `Could not save review (${res.status})`);
+    return { ok: true, review: data };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+};
