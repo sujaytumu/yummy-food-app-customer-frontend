@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TopBar from "../components/TopBar";
 import { loadOrders, downloadReceipt, viewReceipt, emailReceipt } from "../orderStore";
+import OrderTracker from "../components/OrderTracker"; // NEW
 
 // NEW: orders paid from this browser, with receipt download
 const MyOrders = () => {
@@ -18,6 +19,8 @@ const MyOrders = () => {
               Order #{String(o.orderId).slice(-8).toUpperCase()} · {o.restaurant} ·{" "}
               {new Date(o.paidAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
             </div>
+            {/* NEW: live delivery status */}
+            <OrderTracker orderId={o.orderId} paymentId={o.paymentId} />
             <div className="receiptItems">
               {o.items.map((it, i) => (
                 <div key={i} className="receiptRow">

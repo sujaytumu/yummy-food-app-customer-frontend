@@ -348,3 +348,14 @@ body {
 .myOrderCard { border: 1px solid #eee; border-radius: 10px; padding: 14px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; max-width: 520px; }
 button.receiptDownload { border: none; cursor: pointer; font: inherit; }
 .emailMsg { font-weight: 600; }
+
+/* NEW: order status tracker */
+.trackerError { color: #b91c1c; font-size: 13px; }
+.orderTracker { margin: 6px 0 10px; }
+.trackerSteps { display: flex; justify-content: space-between; gap: 4px; }
+.trackerStep { flex: 1; text-align: center; opacity: 0.4; }
+.trackerStep.done { opacity: 1; }
+.trackerDot { width: 14px; height: 14px; border-radius: 50%; background: #ccc; margin: 0 auto 4px; }
+.trackerStep.done .trackerDot { background: #60b246; }
+.trackerStep.current .trackerDot { box-shadow: 0 0 0 4px rgba(96,178,70,0.25); }
+.trackerLabel { font-size: 11px; color: #444; }

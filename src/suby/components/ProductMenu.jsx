@@ -58,6 +58,7 @@ import { API_URL } from "../api";
 import { useParams } from "react-router-dom";
 import TopBar from "./TopBar";
 import { loadCart, saveCart, saveOrder, downloadReceipt, viewReceipt, emailReceipt } from "../orderStore"; // NEW
+import OrderTracker from "./OrderTracker"; // NEW
 
 // NEW: loads Razorpay Checkout script once
 const loadRazorpay = () =>
@@ -296,6 +297,8 @@ const ProductMenu = () => {
           <div className="checkoutForm receiptBox">
             <h3>✅ Payment successful</h3>
             <div className="receiptMeta">Order #{String(receipt.orderId).slice(-8).toUpperCase()} · {receipt.restaurant}</div>
+            {/* NEW: live delivery status */}
+            <OrderTracker orderId={receipt.orderId} paymentId={receipt.paymentId} />
             <div className="receiptItems">
               {receipt.items.map((it, i) => (
                 <div key={i} className="receiptRow">
