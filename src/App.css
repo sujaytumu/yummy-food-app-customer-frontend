@@ -1,31 +1,97 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+/* ============================================================
+   YUMMY — design tokens
+   Warm, appetite-forward palette: chili red + turmeric gold on
+   a cream base, paired with a characterful serif for headlines
+   so the brand reads as a food brand, not a generic SaaS kit.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500;1,9..144,600&family=Figtree:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --ink: #2b1b13;
+    --ink-soft: #5b4a3e;
+    --muted: #8a7b6e;
+    --paper: #fff8f0;
+    --surface: #ffffff;
+    --line: #efe3d2;
+    --brand: #c8372b;
+    --brand-dark: #9c2920;
+    --gold: #e3a008;
+    --gold-dark: #b5800a;
+    --sage: #3f7d4f;
+    --sage-light: #e7f3ea;
+    --danger: #b91c1c;
+    --radius-s: 8px;
+    --radius-m: 14px;
+    --radius-l: 20px;
+    --shadow-card: 0 10px 30px -14px rgba(43, 27, 19, 0.28);
+    --shadow-soft: 0 6px 18px -10px rgba(43, 27, 19, 0.22);
+    --font-display: "Fraunces", Georgia, serif;
+    --font-body: "Figtree", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
 body {
-    font-family: "Poppins", sans-serif;
+    font-family: var(--font-body);
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
 }
+
+h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+}
+
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+button { font-family: inherit; }
+
+/* ---- top bar ---- */
 
 .topBarSection {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 100px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid var(--line);
+    box-shadow: var(--shadow-soft);
     position: fixed;
     width: 90%;
     min-width: 80%;
     top: 0;
     left: 0;
     z-index: 100;
-    background-color: white;
+    background-color: var(--surface);
 }
 
 .companyTitle h2 {
-    color: orangered;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 1.9rem;
+    color: var(--brand);
     text-decoration: none;
+    letter-spacing: -0.01em;
 }
 
+/* NEW: My Orders link in top bar */
+.topBarLinks { display: flex; gap: 16px; }
+.topBarLinks a.link {
+    font-weight: 600;
+    color: var(--ink-soft);
+    padding: 6px 2px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+.topBarLinks a.link:hover { color: var(--brand); border-bottom-color: var(--brand); }
 
 /* item section */
 
@@ -35,23 +101,14 @@ body {
     margin-top: 100px;
 }
 
-.gallery {
-    width: 150px;
-}
-
-.gallery img {
-    width: 100%;
-}
-
+.gallery { width: 150px; }
+.gallery img { width: 100%; border-radius: var(--radius-s); }
 
 /* landingPage */
 
-.landingSection {
-    padding: 0 120px;
-}
+.landingSection { padding: 0 120px; }
 
-
-/* chainseCtion */
+/* chainSection */
 
 .chainSection {
     display: flex;
@@ -60,9 +117,7 @@ body {
     height: auto;
 }
 
-.vendorBox {
-    border-radius: 10px;
-}
+.vendorBox { border-radius: var(--radius-m); }
 
 .vendorBox img {
     width: 350px;
@@ -70,7 +125,8 @@ body {
     flex: 0 0 auto;
     margin-right: 30px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: var(--radius-m);
+    box-shadow: var(--shadow-card);
 }
 
 .btnSection {
@@ -84,83 +140,84 @@ body {
 
 .btnSection button {
     border: none;
-    background: none;
+    background: var(--surface);
+    color: var(--ink);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    box-shadow: var(--shadow-soft);
+    cursor: pointer;
 }
 
-.btnIcons {
-    font-size: x-large;
-}
-
+.btnIcons { font-size: x-large; }
 
 /* firmSection */
 
 .firmSection {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    gap: 24px;
     margin: 0 auto;
 }
 
 .filterButtons {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 12px;
 }
 
 .filterButtons button {
-    width: 10rem;
-    padding: 5px 0;
+    width: auto;
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink-soft);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.filterButtons button:hover { border-color: var(--brand); color: var(--brand); }
+
+.activeButton {
+    background-color: var(--brand) !important;
+    border-color: var(--brand) !important;
+    color: #fff !important;
 }
 
-.firmGroup {
-    position: relative;
-}
+.firmGroup { position: relative; border-radius: var(--radius-m); overflow: hidden; box-shadow: var(--shadow-card); }
 
 .firmGroup img {
-    width: 240px;
+    width: 100%;
     height: 180px;
     flex: 0 0 auto;
-    margin-right: 30px;
+    margin-right: 0;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: var(--radius-m);
+    display: block;
 }
 
-.firmDetails {
-    padding-left: 10px;
-}
+.firmDetails { padding: 10px 2px 0; }
 
 .firmOffer {
     width: 100%;
-    max-width: 85%;
+    max-width: 100%;
     position: absolute;
-    bottom: 5px;
-    padding-left: 10px;
-    font-size: 1rem;
-    font-weight: 800;
+    bottom: 0;
+    left: 0;
+    padding-left: 12px;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
     padding-bottom: 10px;
-    padding-top: 20px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    background: transparent;
-    background: linear-gradient(to bottom, rgba(50, 0, 0, 0.08), black);
-    color: white;
-    text-transform: uppercase;
+    padding-top: 24px;
+    background: linear-gradient(to bottom, rgba(43, 27, 19, 0), rgba(43, 27, 19, 0.85));
+    color: #fff;
 }
 
-.firmName {
-    color: black;
-}
-
-.firmArea {
-    font-size: small;
-    color: gray;
-}
-
-.activeButton {
-    background-color: darkblue;
-    color: white;
-}
-
+.firmName { color: var(--ink); font-weight: 700; }
+.firmArea { font-size: 0.85rem; color: var(--muted); }
 
 /* productSection */
 
@@ -172,42 +229,46 @@ body {
 }
 
 .productSection h3 {
-    text-align: center;
-    background-color: orange;
+    text-align: left;
+    background: none;
+    font-size: 1.8rem;
+    margin-bottom: 4px;
 }
 
 .productBox {
     display: flex;
     justify-content: space-between;
-    padding: 10px 30px;
-    border-top: 2px solid lightgray;
+    padding: 18px 20px;
+    border-top: 1px solid var(--line);
     position: relative;
 }
+.productBox strong { font-weight: 700; color: var(--ink); }
 
 .productGroup img {
     width: 100px;
-    border-radius: 5px;
+    border-radius: var(--radius-s);
+    box-shadow: var(--shadow-soft);
 }
 
 .addButton {
-    border: 1px solid lightgray;
+    border: 1px solid var(--brand);
     text-align: center;
-    background-color: white;
-    border-radius: 5px;
-    color: green;
+    background-color: var(--surface);
+    border-radius: var(--radius-s);
+    color: var(--brand);
+    font-weight: 700;
     position: absolute;
-    bottom: 10px;
+    bottom: 18px;
     width: 100%;
-    max-width: 80px;
+    max-width: 90px;
+    padding: 6px 0;
     margin-left: 10px;
     cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
 }
+.addButton:hover { background: var(--brand); color: #fff; }
 
-.link {
-    color: black;
-    text-decoration: none;
-}
-
+.link { color: var(--ink); text-decoration: none; }
 
 /* loaderSection */
 
@@ -218,34 +279,20 @@ body {
 }
 
 @media (max-width: 576px) {
-    .topBarSection {
-        padding: 0 20px;
-    }
-    .landingSection {
-        padding: 0 10px;
-    }
-    .itemSection {
-        margin-top: 80px;
-    }
-    h3 {
-        font-weight: 800;
-        font-size: medium;
-        color: rgb(34, 30, 30);
-    }
-    .chainSection {
-        height: 190px;
-    }
+    .topBarSection { padding: 0 20px; }
+    .landingSection { padding: 0 10px; }
+    .itemSection { margin-top: 80px; }
+    h3 { font-weight: 700; font-size: medium; color: var(--ink); }
+    .chainSection { height: 190px; }
     .vendorBox img {
         width: 260px;
         height: 180px;
         flex: 0 0 auto;
         margin-right: 30px;
         object-fit: cover;
-        border-radius: 10px;
+        border-radius: var(--radius-m);
     }
-    .mediaChainSection {
-        margin-top: -30px;
-    }
+    .mediaChainSection { margin-top: -30px; }
     .firmSection {
         display: flex;
         flex-direction: column;
@@ -253,48 +300,22 @@ body {
         align-items: center;
         margin-left: 20px;
     }
-    .firmOffer {
-        position: absolute;
-        width: 100%;
-        max-width: 88%;
-    }
-    .firmGroup img {
-        width: 300px;
-    }
-    .productSection {
-        padding: 0 10px;
-    }
-    .productSection h3 {
-        text-align: center;
-        background-color: orange;
-    }
+    .firmOffer { position: absolute; width: 100%; max-width: 100%; }
+    .firmGroup img { width: 300px; }
+    .productSection { padding: 0 10px; }
+    .productSection h3 { text-align: left; background: none; }
     .searchBar {
-        border: 1px solid red;
+        border: 1px solid var(--brand);
         width: 50%;
         display: flex;
         justify-content: center;
         display: none;
     }
-    .searchBar input {
-        width: 100%;
-        max-width: 50%;
-    }
-    .filterButtons button {
-        width: 5rem;
-        padding: 5px;
-        margin-right: 5px;
-    }
-    .userAuth {
-        margin-right: 10px;
-    }
-    .btnIcons {
-        font-size: large;
-        gap: 2px;
-    }
-    .chainTitle {
-        position: relative;
-        top: -10px;
-    }
+    .searchBar input { width: 100%; max-width: 50%; }
+    .filterButtons button { width: auto; padding: 6px 14px; margin-right: 5px; }
+    .userAuth { margin-right: 10px; }
+    .btnIcons { font-size: large; gap: 2px; }
+    .chainTitle { position: relative; top: -10px; }
     .loaderSection {
         position: relative;
         background: transparent;
@@ -304,58 +325,221 @@ body {
     }
 }
 
-
 /* hoverEffect */
 
-.zoomEffect {
-    transition: transform 0.3s ease-in-out;
-    overflow: hidden;
+.zoomEffect { transition: transform 0.3s ease-in-out; overflow: hidden; }
+.zoomEffect:hover { transform: scale(0.97); }
+
+/* ---- cart bar + checkout modal (Razorpay) ---- */
+
+.qtyControl { display: flex; justify-content: space-around; align-items: center; cursor: default; font-weight: 700; }
+.qtyControl span { cursor: pointer; padding: 0 8px; user-select: none; color: var(--brand); }
+
+.cartBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--ink);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    z-index: 50;
+    font-weight: 600;
+    box-shadow: 0 -10px 24px -12px rgba(0, 0, 0, 0.35);
+}
+.cartBar button {
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radius-s);
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+}
+.cartBar button:hover { filter: brightness(1.08); }
+.cartClear {
+    margin-left: auto;
+    margin-right: 14px;
+    background: transparent !important;
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,0.4) !important;
+    font-weight: 600 !important;
 }
 
-.zoomEffect:hover {
-    transform: scale(0.95);
+.checkoutOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(43, 27, 19, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    padding: 16px;
 }
-/* NEW: cart bar + checkout modal (Razorpay) */
-.qtyControl { display: flex; justify-content: space-around; align-items: center; cursor: default; }
-.qtyControl span { cursor: pointer; padding: 0 6px; user-select: none; }
-.cartBar { position: fixed; bottom: 0; left: 0; right: 0; background: #60b246; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 14px 24px; z-index: 50; font-weight: 600; }
-.cartBar button { background: #fff; color: #60b246; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 700; cursor: pointer; }
-.checkoutOverlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: flex; justify-content: center; align-items: center; z-index: 100; }
-.checkoutForm { background: #fff; padding: 24px; border-radius: 10px; width: min(92vw, 380px); display: flex; flex-direction: column; gap: 10px; }
-.checkoutForm input, .checkoutForm textarea { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font: inherit; }
-.checkoutTotal { font-weight: 700; }
+
+.checkoutForm {
+    background: var(--surface);
+    padding: 26px;
+    border-radius: var(--radius-l);
+    width: min(92vw, 400px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: var(--shadow-card);
+}
+.checkoutForm h3 { margin: 0 0 4px; font-size: 1.4rem; }
+.checkoutForm input, .checkoutForm textarea {
+    padding: 11px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-s);
+    font: inherit;
+    background: var(--paper);
+    color: var(--ink);
+}
+.checkoutForm input:focus, .checkoutForm textarea:focus {
+    outline: none;
+    border-color: var(--brand);
+    background: #fff;
+}
+.checkoutTotal { font-weight: 700; font-size: 1.1rem; }
+.checkoutNote { font-size: 12px; color: var(--muted); }
 .checkoutBtns { display: flex; gap: 10px; }
-.checkoutBtns button { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
-.checkoutBtns button[type="submit"] { background: #e15b64; color: #fff; }
-.paidMsg { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: #60b246; color: #fff; padding: 12px 20px; border-radius: 8px; z-index: 60; }
+.checkoutBtns button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: var(--radius-s);
+    cursor: pointer;
+    font-weight: 700;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--line);
+}
+.checkoutBtns button[type="submit"], .checkoutBtns button.receiptDownload {
+    background: var(--brand);
+    color: #fff;
+    border-color: var(--brand);
+}
+.checkoutBtns button[type="submit"]:hover, .checkoutBtns button.receiptDownload:hover { background: var(--brand-dark); }
+.checkoutBtns button:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* NEW: success panel + payment note */
-.checkoutNote { font-size: 12px; color: #777; }
+.paidMsg {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--sage);
+    color: #fff;
+    font-weight: 700;
+    padding: 12px 20px;
+    border-radius: var(--radius-s);
+    z-index: 60;
+    box-shadow: var(--shadow-card);
+}
+
+/* ---- success panel / receipt ---- */
+
 .receiptBox { max-height: 90vh; overflow-y: auto; }
-.receiptMeta { font-size: 13px; color: #666; word-break: break-all; }
-.receiptItems { border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.receiptBox h3 { color: var(--sage); }
+.receiptMeta { font-size: 13px; color: var(--muted); word-break: break-all; }
+.receiptItems {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
 .receiptRow { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
-.receiptTotal { font-weight: 700; border-top: 1px dashed #ccc; padding-top: 6px; }
-.receiptDownload { flex: 1; text-align: center; padding: 10px; border-radius: 6px; background: #e15b64; color: #fff; font-weight: 600; text-decoration: none; }
+.receiptRow span:last-child { font-weight: 600; }
+.receiptTotal { font-weight: 700; font-size: 1.05rem; border-top: 1px dashed var(--line); padding-top: 8px; }
+.receiptTotal span:last-child { color: var(--brand); }
+.receiptDownload {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: var(--radius-s);
+    background: var(--brand);
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+}
+.emailMsg { font-weight: 700; color: var(--sage); }
 
-/* NEW: filters, My Orders, top bar link */
-.topBarLinks { display: flex; gap: 16px; font-weight: 600; }
-.menuFilters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 16px; }
-.menuFilters input { flex: 1 1 180px; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font: inherit; }
-.filterBtn { padding: 8px 14px; border: 1px solid #ccc; border-radius: 20px; background: #fff; cursor: pointer; font: inherit; }
-.filterBtn.active { background: #e15b64; color: #fff; border-color: #e15b64; }
-.cartClear { margin-left: auto; margin-right: 10px; background: transparent !important; color: #fff !important; border: 1px solid #fff !important; }
-.myOrderCard { border: 1px solid #eee; border-radius: 10px; padding: 14px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; max-width: 520px; }
-button.receiptDownload { border: none; cursor: pointer; font: inherit; }
-.emailMsg { font-weight: 600; }
+/* ---- menu search + veg/non-veg filter ---- */
 
-/* NEW: order status tracker */
-.trackerError { color: #b91c1c; font-size: 13px; }
-.orderTracker { margin: 6px 0 10px; }
+.menuFilters { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 20px; }
+.menuFilters input {
+    flex: 1 1 200px;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font: inherit;
+    background: var(--surface);
+}
+.menuFilters input:focus { outline: none; border-color: var(--brand); }
+.filterBtn {
+    padding: 9px 18px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink-soft);
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.filterBtn:hover { border-color: var(--brand); }
+.filterBtn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+
+/* ---- My Orders ---- */
+
+.myOrderCard {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: var(--radius-m);
+    padding: 18px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 520px;
+    box-shadow: var(--shadow-soft);
+}
+.myOrderCard button {
+    padding: 8px 14px;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 600;
+    cursor: pointer;
+}
+.myOrderCard button.receiptDownload { border: none; }
+
+/* ---- order status tracker ---- */
+
+.trackerError { color: var(--danger); font-size: 13px; }
+.orderTracker { margin: 8px 0 12px; }
 .trackerSteps { display: flex; justify-content: space-between; gap: 4px; }
 .trackerStep { flex: 1; text-align: center; opacity: 0.4; }
 .trackerStep.done { opacity: 1; }
-.trackerDot { width: 14px; height: 14px; border-radius: 50%; background: #ccc; margin: 0 auto 4px; }
-.trackerStep.done .trackerDot { background: #60b246; }
-.trackerStep.current .trackerDot { box-shadow: 0 0 0 4px rgba(96,178,70,0.25); }
-.trackerLabel { font-size: 11px; color: #444; }
+.trackerDot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--line);
+    margin: 0 auto 6px;
+    transition: background 0.2s ease;
+}
+.trackerStep.done .trackerDot { background: var(--sage); }
+.trackerStep.current .trackerDot { box-shadow: 0 0 0 5px var(--sage-light); }
+.trackerLabel { font-size: 11px; font-weight: 600; color: var(--ink-soft); }
+.trackerStep.current .trackerLabel { color: var(--sage); font-weight: 700; }
