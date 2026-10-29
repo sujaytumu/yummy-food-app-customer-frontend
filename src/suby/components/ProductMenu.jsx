@@ -84,6 +84,7 @@ const parsePrice = (raw) => {
 
 const ProductMenu = () => {
   const [products, setProducts] = useState([]);
+  const [menuLoading, setMenuLoading] = useState(true);
 
   // NEW: cart = { [productId]: qty }, checkout form + status
   const [cart, setCart] = useState({});
@@ -113,6 +114,8 @@ const ProductMenu = () => {
       setProducts(newProductData.products);
     } catch (error) {
       console.error("product failed to fetch", error);
+    } finally {
+      setMenuLoading(false);
     }
   };
 
@@ -274,7 +277,7 @@ const ProductMenu = () => {
   return (
     <>
       <TopBar />
-      <section className="productSection">
+      <section className="productSection menuPage">
         <h3>
           {firmName}
           {ratings.firm.count > 0 && (
@@ -300,30 +303,40 @@ const ProductMenu = () => {
             </button>
           ))}
         </div>
-        {products.length > 0 && visibleProducts.length === 0 && <p>No dishes match your search.</p>}
-        {visibleProducts.map((item) => (
-          <div className="productBox" key={item._id} style={isOut(item) ? { opacity: 0.6 } : undefined}> {/* ✅ key added */}
+        {menuLoading && [0, 1, 2, 3].map((i) => (
+          <div className="menuSkeleton" key={i} aria-hidden="true">
+            <div><div className="a skeleton" /><div className="b skeleton" /><div className="c skeleton" /></div>
+            <div className="img skeleton" />
+          </div>
+        ))}
+        {!menuLoading && products.length === 0 && <p className="emptyNote">This restaurant has not added any dishes yet.</p>}
+        {products.length > 0 && visibleProducts.length === 0 && <p className="emptyNote">No dishes match your search. Try a different word or clear the filter.</p>}
+        {visibleProducts.map((item, i) => (
+          <div className={`productBox${isOut(item) ? " soldOut" : ""}`} key={item._id} style={{ "--i": Math.min(i, 8) }}>
             <div>
               <div><strong>{item.productName}</strong></div>
               {ratings.ratings[item._id] && (
                 <div className="ratingTag">★ {ratings.ratings[item._id].avg} ({ratings.ratings[item._id].count})</div>
               )}
-              <div>₹{item.price}</div>
-              <div>{item.description}</div>
+              <div className="pPrice">₹{item.price}</div>
+              <div className="pDesc">{item.description}</div>
             </div>
             <div className="productGroup">
               <img src={item.image} alt={item.productName} /> {/* ✅ Cloudinary URL */}
               {/* UPDATED: ADD button now adds to cart, shows -/qty/+ once added */}
               {isOut(item) ? (
-                <div className="addButton" style={{ background: "#ccc", color: "#555", cursor: "not-allowed" }}>Out of stock</div>
+                <div className="addButton disabled" aria-disabled="true">Sold out</div>
               ) : cart[item._id] ? (
-                <div className="addButton qtyControl">
-                  <span onClick={() => removeFromCart(item._id)}>−</span>
-                  <span>{cart[item._id]}</span>
-                  <span onClick={() => addToCart(item._id)}>+</span>
+                <div className="addButton qtyControl" role="group" aria-label={`${item.productName} quantity`}>
+                  <span role="button" tabIndex={0} aria-label="Remove one" onClick={() => removeFromCart(item._id)}
+                    onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && removeFromCart(item._id)}>−</span>
+                  <span key={cart[item._id]} aria-live="polite">{cart[item._id]}</span>
+                  <span role="button" tabIndex={0} aria-label="Add one" onClick={() => addToCart(item._id)}
+                    onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && addToCart(item._id)}>+</span>
                 </div>
               ) : (
-                <div className="addButton" onClick={() => addToCart(item._id)}>ADD</div>
+                <div className="addButton" role="button" tabIndex={0} onClick={() => addToCart(item._id)}
+                  onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && addToCart(item._id)}>Add</div>
               )}
             </div>
           </div>
@@ -337,7 +350,10 @@ const ProductMenu = () => {
       {receipt && (
         <div className="checkoutOverlay">
           <div className="checkoutForm receiptBox">
-            <h3>✅ Payment successful</h3>
+            <h3>
+              <svg className="tickDraw" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="17" /><path d="M9.5 17.5l5 5 10-11" /></svg>
+              Payment successful
+            </h3>
             <div className="receiptMeta">Order #{String(receipt.orderId).slice(-8).toUpperCase()} · {receipt.restaurant}</div>
             {/* NEW: live delivery status */}
             <OrderTracker orderId={receipt.orderId} paymentId={receipt.paymentId} />
@@ -351,7 +367,7 @@ const ProductMenu = () => {
               <div className="receiptRow receiptTotal"><span>Total paid</span><span>₹{Number(receipt.total).toFixed(2)}</span></div>
             </div>
             <div className="receiptMeta">Payment ID: {receipt.paymentId}</div>
-            <Link to={`/order/${receipt.orderId}?pid=${encodeURIComponent(receipt.paymentId)}`}>Track this order live →</Link>
+            <Link to={`/order/${receipt.orderId}?pid=${encodeURIComponent(receipt.paymentId)}`}>Track this order live</Link>
             {emailMsg && <div className="receiptMeta emailMsg">{emailMsg}</div>}
             {receipt.paidVia && <div className="receiptMeta">Paid via: {receipt.paidVia}</div>}
             <div className="checkoutBtns">
@@ -385,7 +401,10 @@ const ProductMenu = () => {
 
       {totalQty > 0 && !showCheckout && (
         <div className="cartBar">
-          <span>{totalQty} item(s) · ₹{totalPrice}</span>
+          <span>
+            <b key={totalQty}>{totalQty} item{totalQty === 1 ? "" : "s"}</b>
+            <span style={{ fontWeight: 500, opacity: 0.8, fontSize: 14 }}>₹{totalPrice}</span>
+          </span>
           <button className="cartClear" onClick={clearCart}>Clear</button>
           <button
             onClick={() => {

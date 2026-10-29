@@ -9,7 +9,7 @@ const Stars = ({ value, onChange, size = 24 }) => (
         role="radio"
         aria-checked={value === n}
         tabIndex={onChange ? 0 : -1}
-        style={{ fontSize: size, cursor: onChange ? "pointer" : "default", color: n <= value ? "#f5a623" : "#ccc" }}
+        style={{ fontSize: size, cursor: onChange ? "pointer" : "default", color: n <= value ? "#f08f00" : "#d5d8ec" }}
         onClick={() => onChange && onChange(n)}
         onKeyDown={(e) => onChange && (e.key === "Enter" || e.key === " ") && onChange(n)}
       >

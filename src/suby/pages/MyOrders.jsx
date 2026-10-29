@@ -12,10 +12,12 @@ const MyOrders = () => {
     <>
       <TopBar />
       <section className="productSection">
-        <h3>My Orders</h3>
-        {orders.length === 0 && <p>No orders yet on this device.</p>}
-        {orders.map((o) => (
-          <div className="myOrderCard" key={o.orderId}>
+        <h3>My orders</h3>
+        {orders.length === 0 && (
+          <p className="emptyNote">No orders yet on this device. <Link to="/">Find something to eat</Link></p>
+        )}
+        {orders.map((o, i) => (
+          <div className="myOrderCard" key={o.orderId} style={{ "--i": Math.min(i, 6) }}>
             <div className="receiptMeta">
               Order #{String(o.orderId).slice(-8).toUpperCase()} · {o.restaurant} ·{" "}
               {new Date(o.paidAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
