@@ -68,7 +68,7 @@ const OrderStatus = () => {
             )}
           </div>
         )}
-        <Link to="/my-orders">← My Orders</Link>
+        <Link to="/my-orders" style={{ color: "var(--brand)", fontWeight: 600 }}>← My Orders</Link>
       </section>
     </>
   );
