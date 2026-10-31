@@ -1,4 +1,6 @@
 import { API_URL } from "./api";
+import { Capacitor } from "@capacitor/core"; // NEW: Android app wrapper
+import { Browser } from "@capacitor/browser"; // NEW
 
 // NEW: small helpers (all localStorage access is wrapped - it can throw in private mode)
 const safeGet = (key, fallback) => {
@@ -35,6 +37,15 @@ const receiptUrl = (orderId, paymentId, inline) =>
 
 // Fetches the PDF as a file and saves it; shows the real reason if something goes wrong
 export const downloadReceipt = async (orderId, paymentId) => {
+  // NEW: inside the Android app a blob download does nothing, so hand the PDF link to the phone's browser instead
+  if (Capacitor.isNativePlatform()) {
+    try {
+      await Browser.open({ url: receiptUrl(orderId, paymentId, false) });
+    } catch (err) {
+      alert(err.message || "Could not open the receipt");
+    }
+    return;
+  }
   try {
     const res = await fetch(receiptUrl(orderId, paymentId, false));
     if (!res.ok) {
@@ -79,6 +90,10 @@ export const emailReceipt = async (orderId, paymentId, email) => {
 
 // Opens the PDF in a new tab (viewer)
 export const viewReceipt = (orderId, paymentId) => {
+  if (Capacitor.isNativePlatform()) {
+    Browser.open({ url: receiptUrl(orderId, paymentId, true) }).catch(() => {}); // NEW: Android app
+    return;
+  }
   window.open(receiptUrl(orderId, paymentId, true), "_blank", "noopener");
 };
 
