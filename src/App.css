@@ -10,10 +10,10 @@
   --ink: #17163a;
   --ink-2: #3a3961;
   --muted: #62658a;
-  --bg: #f5f6fc;
+  --bg: #fbf8f3;
   --surface: #ffffff;
-  --line: #e4e6f4;
-  --line-2: #eef0fa;
+  --line: #ece6dc;
+  --line-2: #f5f0e8;
 
   --indigo: #2e2c86;
   --indigo-deep: #201f63;
@@ -102,9 +102,22 @@ a { color: var(--indigo); }
 
 /* ---------- landing ---------- */
 .landingSection { max-width: 1180px; margin: 0 auto; padding: 0 16px 80px; }
-.intro { padding: 30px 0 8px; animation: rise 0.6s var(--ease) both; }
-.intro h1 { font-size: clamp(32px, 7vw, 56px); font-weight: 800; letter-spacing: -0.035em; max-width: 14ch; }
-.intro p { color: var(--muted); margin: 10px 0 0; font-size: 17px; max-width: 44ch; }
+.intro {
+  position: relative; overflow: hidden; isolation: isolate;
+  margin: 18px 0 6px; padding: clamp(26px, 5vw, 52px) clamp(22px, 5vw, 56px);
+  border-radius: 30px; color: #fff;
+  background:
+    radial-gradient(520px 260px at 92% 0%, rgba(255, 164, 27, 0.55), transparent 70%),
+    radial-gradient(420px 300px at 0% 110%, rgba(217, 45, 69, 0.38), transparent 70%),
+    linear-gradient(135deg, #2e2c86 0%, #201f63 55%, #17163a 100%);
+  box-shadow: 0 30px 50px -28px rgba(32, 31, 99, 0.7);
+  animation: rise 0.6s var(--ease) both;
+}
+.intro::before, .intro::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.14); }
+.intro::before { width: 260px; height: 260px; right: -60px; top: -70px; }
+.intro::after { width: 150px; height: 150px; right: 90px; bottom: -70px; background: rgba(255, 164, 27, 0.18); border: 0; }
+.intro h1 { color: #fff; font-size: clamp(32px, 7vw, 58px); font-weight: 800; letter-spacing: -0.035em; max-width: 13ch; }
+.intro p { color: rgba(255, 255, 255, 0.82); margin: 12px 0 0; font-size: 17px; max-width: 42ch; }
 
 .itemSection {
   display: flex; gap: 18px; overflow-x: auto; padding: 22px 10px 16px; margin: 0 -10px;
@@ -115,7 +128,7 @@ a { color: var(--indigo); }
 .gallery { flex: 0 0 auto; scroll-snap-align: start; }
 .gallery img {
   width: 76px; height: 76px; border-radius: 50%; object-fit: cover; background: var(--line);
-  box-shadow: 0 0 0 3px var(--surface), 0 6px 14px -6px rgba(23, 22, 58, 0.35);
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--saffron-wash), 0 8px 16px -6px rgba(240, 143, 0, 0.45);
   transition: transform 0.35s var(--spring);
 }
 .gallery:hover img { transform: translateY(-4px) scale(1.07); }
@@ -380,4 +393,15 @@ button.receiptDownload { font: inherit; font-weight: 800; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; animation-delay: 0ms !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
   .trackerDot, .trackerDot svg { transition-delay: 0ms !important; }
+}
+
+@media (max-width: 640px) {
+  .intro {
+    background:
+      radial-gradient(260px 160px at 100% 0%, rgba(255, 164, 27, 0.4), transparent 70%),
+      radial-gradient(240px 180px at 0% 100%, rgba(217, 45, 69, 0.28), transparent 70%),
+      linear-gradient(135deg, #2e2c86 0%, #201f63 60%, #17163a 100%);
+  }
+  .intro::before { width: 150px; height: 150px; right: -50px; top: -60px; }
+  .intro::after { display: none; }
 }
