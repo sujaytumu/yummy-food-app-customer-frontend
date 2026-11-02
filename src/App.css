@@ -425,3 +425,7 @@ button.receiptDownload { font: inherit; font-weight: 800; cursor: pointer; }
 .promoMsg { font-size: 14px; font-weight: 600; margin: 4px 0 2px; }
 .promoOk { color: var(--mint); }
 .promoErr { color: var(--chilli); }
+
+/* ---------- test-payment helper ---------- */
+.testPayBox { display: flex; flex-direction: column; gap: 3px; margin: 10px 0 6px; padding: 12px 14px; border-radius: var(--r-ctl); background: var(--saffron-wash); border: 1.5px dashed var(--saffron-deep); font-size: 13.5px; color: var(--saffron-ink); }
+.testPayBox strong { font-family: var(--font-display); font-size: 15px; color: var(--ink); }

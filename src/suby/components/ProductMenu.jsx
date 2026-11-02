@@ -101,6 +101,7 @@ const ProductMenu = () => {
   const [addrLabel, setAddrLabel] = useState("");
   const [saveAddr, setSaveAddr] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [payConfig, setPayConfig] = useState({ testMode: false, blocked: false });
   const [promoInput, setPromoInput] = useState("");
   const [promo, setPromo] = useState(null); // { code, discount } once a code has been accepted by the server
   const [promoMsg, setPromoMsg] = useState("");
@@ -177,6 +178,12 @@ const ProductMenu = () => {
   const cartItems = products.filter((p) => cart[p._id] && !isOut(p));
   const totalQty = cartItems.reduce((n, p) => n + cart[p._id], 0);
   const totalPrice = cartItems.reduce((n, p) => n + parsePrice(p.price) * cart[p._id], 0);
+  // Ask the server whether payments are in test mode (so we can show the test card / UPI details)
+  useEffect(() => {
+    if (!showCheckout) return;
+    fetch(`${API_URL}/payment/config`).then((r) => (r.ok ? r.json() : null)).then((c) => c && setPayConfig(c)).catch(() => {});
+  }, [showCheckout]);
+
   const discount = promo ? promo.discount : 0;
   const payTotal = Math.round((totalPrice - discount) * 100) / 100;
 
@@ -522,6 +529,15 @@ const ProductMenu = () => {
             {promo && <div className="promoMsg promoOk">Code {promo.code} applied. You save ₹{promo.discount}.</div>}
             {promo && <div className="checkoutNote">Subtotal ₹{totalPrice}</div>}
             <div className="checkoutTotal">Total: ₹{payTotal}</div>
+            {payConfig.testMode && (
+              <div className="testPayBox" role="note">
+                <strong>Test mode: no real money is charged</strong>
+                <span>Card: 4111 1111 1111 1111, any future date, any CVV, OTP 1234</span>
+                <span>UPI: success@razorpay (use failure@razorpay to test a failed payment)</span>
+                <span>Netbanking: pick any bank, then tap Success</span>
+              </div>
+            )}
+            {payConfig.blocked && <div className="promoMsg promoErr" role="alert">Payments are switched off until the server uses Razorpay test keys.</div>}
             <div className="checkoutNote">Pay with UPI, Netbanking or Indian cards. International cards are not supported.</div>
             <div className="checkoutBtns">
               <button type="button" onClick={() => setShowCheckout(false)} disabled={paying}>Back</button>
