@@ -303,7 +303,11 @@ const ProductMenu = () => {
         modal: { ondismiss: () => setPaying(false) },
       });
       rzp.on("payment.failed", (r) => {
-        alert("Payment failed: " + (r.error?.description || "Try again"));
+        const e = r.error || {};
+        // Show Razorpay's own reason/code so a failure can be diagnosed (e.g. test-mode account, bank decline, UPI app issue)
+        const detail = [e.reason, e.code, e.step].filter(Boolean).join(" / ");
+        alert("Payment failed: " + (e.description || "Try again") + (detail ? "\n(" + detail + ")" : ""));
+        console.error("[razorpay] payment.failed", e);
         setPaying(false);
       });
       rzp.open();
