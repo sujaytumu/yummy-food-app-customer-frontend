@@ -52,6 +52,9 @@ const OrderStatus = () => {
                   <span>₹{(it.price * it.qty).toFixed(2)}</span>
                 </div>
               ))}
+              {order.discount > 0 && (
+                <div className="receiptRow"><span>Discount ({order.promoCode})</span><span>− ₹{Number(order.discount).toFixed(2)}</span></div>
+              )}
               <div className="receiptRow receiptTotal"><span>Total paid</span><span>₹{Number(order.amount).toFixed(2)}</span></div>
             </div>
             {(liveStatus || order.deliveryStatus) === "delivered" && (

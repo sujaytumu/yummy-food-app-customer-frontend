@@ -405,3 +405,23 @@ button.receiptDownload { font: inherit; font-weight: 800; cursor: pointer; }
   .intro::before { width: 150px; height: 150px; right: -50px; top: -60px; }
   .intro::after { display: none; }
 }
+
+/* ---------- restaurant search + reorder ---------- */
+.firmSearch {
+  width: 100%; max-width: 520px; margin-top: 14px; padding: 13px 18px; border-radius: var(--r-pill);
+  border: 1.5px solid var(--line); background: var(--surface); font-size: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.firmSearch:focus { outline: none; border-color: var(--indigo); box-shadow: 0 0 0 4px rgba(46, 44, 134, 0.12); }
+.firmSearch::placeholder { color: var(--muted); }
+.reorderBtn { background: var(--saffron) !important; color: var(--ink) !important; border-color: var(--saffron) !important; font-weight: 800; }
+
+/* ---------- promo code ---------- */
+.promoRow { display: flex; gap: 8px; margin: 10px 0 4px; }
+.promoRow input { flex: 1; min-width: 0; padding: 11px 14px; border-radius: var(--r-ctl); border: 1.5px dashed var(--indigo); background: var(--saffron-wash); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.promoRow input:focus { outline: none; box-shadow: 0 0 0 4px rgba(46, 44, 134, 0.12); }
+.promoRow button { padding: 0 18px; border-radius: var(--r-ctl); border: 1.5px solid var(--indigo); background: var(--surface); color: var(--indigo); font-weight: 700; }
+.promoRow button:disabled { opacity: 0.5; cursor: not-allowed; }
+.promoMsg { font-size: 14px; font-weight: 600; margin: 4px 0 2px; }
+.promoOk { color: var(--mint); }
+.promoErr { color: var(--chilli); }

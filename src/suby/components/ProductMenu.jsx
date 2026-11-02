@@ -101,6 +101,10 @@ const ProductMenu = () => {
   const [addrLabel, setAddrLabel] = useState("");
   const [saveAddr, setSaveAddr] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [promoInput, setPromoInput] = useState("");
+  const [promo, setPromo] = useState(null); // { code, discount } once a code has been accepted by the server
+  const [promoMsg, setPromoMsg] = useState("");
+  const [promoBusy, setPromoBusy] = useState(false);
   const [paidMsg, setPaidMsg] = useState("");
   // NEW: shown after a successful payment (order summary + PDF receipt link)
   const [receipt, setReceipt] = useState(null);
@@ -135,12 +139,16 @@ const ProductMenu = () => {
     });
 
   // NEW: keep the cart across refreshes (per restaurant)
+  // Saving waits until this restaurant's cart has been loaded, otherwise the initial empty cart overwrites the saved one.
+  const [cartLoadedFor, setCartLoadedFor] = useState(null);
   useEffect(() => {
     setCart(loadCart(firmId));
+    setCartLoadedFor(firmId);
   }, [firmId]);
   useEffect(() => {
+    if (cartLoadedFor !== firmId) return;
     saveCart(firmId, cart);
-  }, [firmId, cart]);
+  }, [firmId, cart, cartLoadedFor]);
 
   const clearCart = () => setCart({});
 
@@ -169,6 +177,36 @@ const ProductMenu = () => {
   const cartItems = products.filter((p) => cart[p._id] && !isOut(p));
   const totalQty = cartItems.reduce((n, p) => n + cart[p._id], 0);
   const totalPrice = cartItems.reduce((n, p) => n + parsePrice(p.price) * cart[p._id], 0);
+  const discount = promo ? promo.discount : 0;
+  const payTotal = Math.round((totalPrice - discount) * 100) / 100;
+
+  // A code is checked against one specific cart, so any cart change clears it.
+  useEffect(() => {
+    setPromo(null);
+    setPromoMsg("");
+  }, [totalPrice, firmId]);
+
+  const applyPromo = async () => {
+    const code = promoInput.trim();
+    if (!code) return;
+    setPromoBusy(true);
+    setPromoMsg("");
+    try {
+      const res = await fetch(`${API_URL}/promo/validate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firmId, code, items: cartItems.map((p) => ({ productId: p._id, qty: cart[p._id] })) }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not apply this code");
+      setPromo({ code: data.code, discount: data.discount });
+    } catch (e) {
+      setPromo(null);
+      setPromoMsg(e.message || "Could not apply this code");
+    } finally {
+      setPromoBusy(false);
+    }
+  };
 
   // NEW: Razorpay payment flow (create order -> open checkout -> verify on backend)
   const handlePayment = async (e) => {
@@ -202,6 +240,7 @@ const ProductMenu = () => {
           firmId,
           items: cartItems.map((p) => ({ productId: p._id, qty: cart[p._id] })),
           customer: { ...customer, email: customer.email.trim() },
+          ...(promo ? { promoCode: promo.code } : {}),
         }),
       });
       const order = await res.json();
@@ -230,8 +269,9 @@ const ProductMenu = () => {
               orderId: verifyData.orderId,
               paymentId: verifyData.paymentId || response.razorpay_payment_id,
               restaurant: firmName,
-              items: cartItems.map((p) => ({ name: p.productName, qty: cart[p._id], price: parsePrice(p.price) })),
-              total: totalPrice,
+              firmId,
+              items: cartItems.map((p) => ({ productId: p._id, name: p.productName, qty: cart[p._id], price: parsePrice(p.price) })),
+              total: payTotal,
               paidVia: "",
               email: customer.email.trim(),
             };
@@ -456,11 +496,32 @@ const ProductMenu = () => {
             {saveAddr && (
               <input placeholder="Label (e.g. Home, Work)" value={addrLabel} maxLength={20} onChange={(e) => setAddrLabel(e.target.value)} />
             )}
-            <div className="checkoutTotal">Total: ₹{totalPrice}</div>
+            <div className="promoRow">
+              <input
+                type="text"
+                placeholder="Promo code"
+                aria-label="Promo code"
+                value={promoInput}
+                onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                disabled={paying || !!promo}
+                maxLength={16}
+              />
+              {promo ? (
+                <button type="button" onClick={() => { setPromo(null); setPromoInput(""); }} disabled={paying}>Remove</button>
+              ) : (
+                <button type="button" onClick={applyPromo} disabled={paying || promoBusy || !promoInput.trim()}>
+                  {promoBusy ? "Checking..." : "Apply"}
+                </button>
+              )}
+            </div>
+            {promoMsg && <div className="promoMsg promoErr" role="alert">{promoMsg}</div>}
+            {promo && <div className="promoMsg promoOk">Code {promo.code} applied. You save ₹{promo.discount}.</div>}
+            {promo && <div className="checkoutNote">Subtotal ₹{totalPrice}</div>}
+            <div className="checkoutTotal">Total: ₹{payTotal}</div>
             <div className="checkoutNote">Pay with UPI, Netbanking or Indian cards. International cards are not supported.</div>
             <div className="checkoutBtns">
               <button type="button" onClick={() => setShowCheckout(false)} disabled={paying}>Back</button>
-              <button type="submit" disabled={paying}>{paying ? "Please wait..." : `Pay ₹${totalPrice}`}</button>
+              <button type="submit" disabled={paying}>{paying ? "Please wait..." : `Pay ₹${payTotal}`}</button>
             </div>
           </form>
         </div>

@@ -19,6 +19,7 @@ const FirmCollections = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [favorites, setFavorites] = useState(loadFavorites); // device-local
   const [onlyFavorites, setOnlyFavorites] = useState(false);
+  const [query, setQuery] = useState("");
   const [popId, setPopId] = useState(""); // heart that was just toggled (plays the pop animation)
 
   useEffect(() => {
@@ -45,12 +46,22 @@ const FirmCollections = () => {
     .filter(
       (item) =>
         (selectedRegion === "All" || (item.region || []).map((r) => r.toLowerCase()).includes(selectedRegion.toLowerCase())) &&
-        (!onlyFavorites || favorites.includes(item._id))
+        (!onlyFavorites || favorites.includes(item._id)) &&
+        (!query.trim() ||
+          [item.firmName, item.area, ...(item.region || [])].join(" ").toLowerCase().includes(query.trim().toLowerCase()))
     );
 
   return (
     <>
       <h3 className="firmHeading">Restaurants with online food delivery in Hyderabad</h3>
+      <input
+        type="search"
+        className="firmSearch"
+        placeholder="Search restaurants, cuisines or areas"
+        aria-label="Search restaurants"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
       <div className="filterButtons" role="group" aria-label="Filter restaurants">
         {FILTERS.map((f) => (
           <button
@@ -117,7 +128,7 @@ const FirmCollections = () => {
         })}
         {!loading && firms.length === 0 && (
           <p className="emptyNote">
-            {onlyFavorites ? "No favorites yet. Tap the heart on a restaurant to save it." : "No restaurants match this filter."}
+            {onlyFavorites ? "No favorites yet. Tap the heart on a restaurant to save it." : query ? `No restaurants match "${query}".` : "No restaurants match this filter."}
           </p>
         )}
       </section>

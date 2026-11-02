@@ -1,12 +1,22 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import TopBar from "../components/TopBar";
-import { loadOrders, downloadReceipt, viewReceipt, emailReceipt } from "../orderStore";
+import { loadOrders, saveCart, downloadReceipt, viewReceipt, emailReceipt } from "../orderStore";
 import OrderTracker from "../components/OrderTracker"; // NEW
 
 // NEW: orders paid from this browser, with receipt download
 const MyOrders = () => {
   const [orders] = useState(loadOrders);
+  const navigate = useNavigate();
+
+  // Put the same dishes back in the cart and open that restaurant's menu.
+  // The menu drops anything that has since gone out of stock.
+  const reorder = (o) => {
+    const cart = {};
+    o.items.forEach((it) => { if (it.productId) cart[it.productId] = it.qty; });
+    saveCart(o.firmId, cart);
+    navigate(`/products/${o.firmId}/${encodeURIComponent(o.restaurant)}`);
+  };
 
   return (
     <>
@@ -37,6 +47,9 @@ const MyOrders = () => {
             <div className="checkoutBtns">
               {o.paymentId && (
                 <Link className="receiptDownload" to={`/order/${o.orderId}?pid=${encodeURIComponent(o.paymentId)}`}>Track live</Link>
+              )}
+              {o.firmId && o.items.every((it) => it.productId) && (
+                <button type="button" className="reorderBtn" onClick={() => reorder(o)}>Reorder</button>
               )}
               <button type="button" onClick={() => viewReceipt(o.orderId, o.paymentId)}>View PDF</button>
               <button
