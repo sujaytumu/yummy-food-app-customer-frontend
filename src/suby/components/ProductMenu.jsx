@@ -63,6 +63,7 @@ import {
   fetchFirmRatings, loadAddresses, saveAddress, deleteAddress,
 } from "../orderStore"; // NEW
 import OrderTracker from "./OrderTracker"; // NEW
+import { isNativeApp, openNativeCheckout, reportPaymentFailure } from "../nativeCheckout"; // NEW: Android app payments
 
 // NEW: loads Razorpay Checkout script once
 const loadRazorpay = () =>
@@ -237,7 +238,8 @@ const ProductMenu = () => {
     }
     setPaying(true);
     try {
-      const loaded = await loadRazorpay();
+      // UPDATED: the Android app uses the native checkout, so it does not need the web script
+      const loaded = isNativeApp() ? true : await loadRazorpay();
       if (!loaded) throw new Error("Could not load Razorpay. Check your internet.");
 
       const res = await fetch(`${API_URL}/payment/create-order`, {
@@ -253,7 +255,7 @@ const ProductMenu = () => {
       const order = await res.json();
       if (!res.ok) throw new Error(order.error || "Could not create order");
 
-      const rzp = new window.Razorpay({
+      const rzpOptions = {
         key: order.keyId,
         amount: order.amount,
         currency: order.currency,
@@ -308,15 +310,29 @@ const ProductMenu = () => {
           }
         },
         modal: { ondismiss: () => setPaying(false) },
-      });
-      rzp.on("payment.failed", (r) => {
-        const e = r.error || {};
-        // Show Razorpay's own reason/code so a failure can be diagnosed (e.g. test-mode account, bank decline, UPI app issue)
+      };
+
+      // Shared failure handler (website + app): shows Razorpay's own reason and reports it to the server log
+      const onFailed = (e = {}) => {
         const detail = [e.reason, e.code, e.step].filter(Boolean).join(" / ");
         alert("Payment failed: " + (e.description || "Try again") + (detail ? "\n(" + detail + ")" : ""));
         console.error("[razorpay] payment.failed", e);
+        reportPaymentFailure(order.orderId, e); // NEW
         setPaying(false);
-      });
+      };
+
+      if (isNativeApp()) {
+        // NEW: Android app -> Razorpay's native checkout (web checkout cannot open bank/OTP pages inside an app WebView)
+        const { handler, modal, ...nativeOptions } = rzpOptions;
+        const result = await openNativeCheckout({ ...nativeOptions, prefill: { ...nativeOptions.prefill, email: customer.email.trim() } });
+        if (result.ok) await handler(result.response);
+        else if (result.cancelled) setPaying(false);
+        else onFailed(result.error);
+        return;
+      }
+
+      const rzp = new window.Razorpay(rzpOptions);
+      rzp.on("payment.failed", (r) => onFailed(r.error || {}));
       rzp.open();
     } catch (err) {
       console.error(err);
