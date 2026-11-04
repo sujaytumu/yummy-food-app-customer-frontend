@@ -16,6 +16,16 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // NEW: fixed signing key for debug builds. Without this every GitHub build got a random new key, and Android
+    // refused to install a new APK over the old one ("package conflicts with an existing package").
+    signingConfigs {
+        debug {
+            storeFile file('yummy-debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
