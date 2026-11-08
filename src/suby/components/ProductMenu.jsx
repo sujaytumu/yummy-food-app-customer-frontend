@@ -102,6 +102,8 @@ const ProductMenu = () => {
   const [addrLabel, setAddrLabel] = useState("");
   const [saveAddr, setSaveAddr] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [isOpen, setIsOpen] = useState(true); // false when the vendor has closed the restaurant
+  const [note, setNote] = useState("");        // special instructions for the kitchen
   const [payConfig, setPayConfig] = useState({ testMode: false, blocked: false });
   const [promoInput, setPromoInput] = useState("");
   const [promo, setPromo] = useState(null); // { code, discount } once a code has been accepted by the server
@@ -179,6 +181,10 @@ const ProductMenu = () => {
   const cartItems = products.filter((p) => cart[p._id] && !isOut(p));
   const totalQty = cartItems.reduce((n, p) => n + cart[p._id], 0);
   const totalPrice = cartItems.reduce((n, p) => n + parsePrice(p.price) * cart[p._id], 0);
+  useEffect(() => {
+    fetch(`${API_URL}/firm/${firmId}/open`).then((r) => (r.ok ? r.json() : null)).then((d) => d && setIsOpen(d.isOpen)).catch(() => {});
+  }, [firmId]);
+
   // Ask the server whether payments are in test mode (so we can show the test card / UPI details)
   useEffect(() => {
     if (!showCheckout) return;
@@ -249,6 +255,7 @@ const ProductMenu = () => {
           firmId,
           items: cartItems.map((p) => ({ productId: p._id, qty: cart[p._id] })),
           customer: { ...customer, email: customer.email.trim() },
+          ...(note.trim() ? { note: note.trim() } : {}),
           ...(promo ? { promoCode: promo.code } : {}),
         }),
       });
@@ -302,6 +309,7 @@ const ProductMenu = () => {
               })
               .catch(() => {});
             setCart({});
+            setNote("");
             setShowCheckout(false);
           } catch (err) {
             alert(err.message);
@@ -351,6 +359,12 @@ const ProductMenu = () => {
             <span className="ratingTag"> ★ {ratings.firm.avg} ({ratings.firm.count})</span>
           )}
         </h3>
+        {!isOpen && (
+          <div className="closedBanner" role="status">
+            <strong>Closed right now</strong> This restaurant is not taking orders at the moment. You can still look at the menu.
+          </div>
+        )}
+
         {/* NEW: search and veg / non-veg filter */}
         <div className="menuFilters">
           <input
@@ -483,8 +497,10 @@ const ProductMenu = () => {
               }
               setShowCheckout(true);
             }}
+            disabled={!isOpen}
+            title={isOpen ? undefined : "This restaurant is closed right now"}
           >
-            Checkout
+            {isOpen ? "Checkout" : "Closed"}
           </button>
         </div>
       )}
@@ -517,6 +533,14 @@ const ProductMenu = () => {
               onChange={(e) => setCustomer({ ...customer, email: e.target.value })} />
             <textarea placeholder="Address" value={customer.address}
               onChange={(e) => setCustomer({ ...customer, address: e.target.value })} />
+            <textarea
+              className="noteBox"
+              placeholder="Special instructions (optional), e.g. less spicy, no onion"
+              value={note}
+              maxLength={200}
+              rows={2}
+              onChange={(e) => setNote(e.target.value)}
+            />
             <label className="saveAddrRow">
               <input type="checkbox" checked={saveAddr} onChange={(e) => setSaveAddr(e.target.checked)} /> Save this address for next time
             </label>

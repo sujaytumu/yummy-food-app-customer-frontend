@@ -45,6 +45,7 @@ const OrderStatus = () => {
               {order.restaurant} · {new Date(order.paidAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
             </div>
             <OrderTracker orderId={orderId} paymentId={pid} onStatus={setLiveStatus} />
+            {order.note && <div className="receiptNote">Your note: {order.note}</div>}
             <div className="receiptItems">
               {order.items.map((it, i) => (
                 <div key={i} className="receiptRow">

@@ -95,12 +95,13 @@ const FirmCollections = () => {
         {firms.map((item, i) => {
           const fav = favorites.includes(item._id);
           return (
-            <Link to={`/products/${item._id}/${item.firmName}`} className="link" key={item._id} style={{ "--i": Math.min(i, 8) }}>
+            <Link to={`/products/${item._id}/${item.firmName}`} className={`link${item.isOpen === false ? " firmClosed" : ""}`} key={item._id} style={{ "--i": Math.min(i, 8) }}>
               <div className="zoomEffect">
                 <div className="firmGroupBox">
                   <div className="firmGroup">
                     <img src={item.image} alt={item.firmName} loading="lazy" />
                     <div className="firmOffer">{item.offer}</div>
+                    {item.isOpen === false && <div className="closedTag">Closed</div>}
                     <button
                       type="button"
                       className={`favBtn${fav ? " active" : ""}${popId === item._id ? " pop" : ""}`}
