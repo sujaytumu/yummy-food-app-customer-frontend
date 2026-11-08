@@ -6,6 +6,7 @@ import { API_URL } from "../api";
 const OrderTracker = ({ orderId, paymentId, onStatus }) => {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
+  const [now, setNow] = useState(Date.now()); // ticks so the countdown stays fresh between polls
   const [ready, setReady] = useState(false); // lets the scooter ride in from the start on first paint
   const timerRef = useRef(null);
 
@@ -39,6 +40,11 @@ const OrderTracker = ({ orderId, paymentId, onStatus }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, paymentId]);
 
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(t);
+  }, []);
+
   // Once the first data has painted at the start position, let the scooter ride to the current step.
   useEffect(() => {
     if (!data || ready) return undefined;
@@ -53,6 +59,16 @@ const OrderTracker = ({ orderId, paymentId, onStatus }) => {
   const idx = Math.max(0, steps.findIndex((s) => s.status === data.deliveryStatus));
   const final = idx === steps.length - 1;
   const progress = ready ? idx / (steps.length - 1) : 0;
+
+  // Delivery estimate: "about 22 min (around 8:45 pm)", or a calm note once it runs past the estimate
+  let eta = null;
+  if (data.etaAt && !final) {
+    const mins = Math.ceil((new Date(data.etaAt).getTime() - now) / 60000);
+    const clock = new Date(data.etaAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true });
+    eta = mins > 0
+      ? { text: `Arriving in about ${mins} min`, sub: `around ${clock}` }
+      : { text: "Running a little late", sub: "Your food is on its way, thanks for waiting" };
+  }
 
   return (
     <div className={`orderTracker${final ? " complete" : ""}`} role="group" aria-label="Order progress">
@@ -79,6 +95,12 @@ const OrderTracker = ({ orderId, paymentId, onStatus }) => {
           ))}
         </ol>
       </div>
+      {eta && (
+        <div className="etaBox" role="status">
+          <strong>{eta.text}</strong>
+          <span>{eta.sub}</span>
+        </div>
+      )}
       <p className="trackerNow" key={data.deliveryStatus}>{data.statusLabel}</p>
     </div>
   );
