@@ -3,6 +3,7 @@ import { API_URL } from "../api";
 import { Link } from "react-router-dom";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { loadFavorites, toggleFavorite } from "../orderStore";
+import { optimizeImage } from "../imageUrl"; // NEW
 
 const FILTERS = [
   { label: "All", region: "All", key: "all" },
@@ -99,7 +100,7 @@ const FirmCollections = () => {
               <div className="zoomEffect">
                 <div className="firmGroupBox">
                   <div className="firmGroup">
-                    <img src={item.image} alt={item.firmName} loading="lazy" />
+                    <img src={optimizeImage(item.image, 600)} alt={item.firmName} loading="lazy" decoding="async" />
                     <div className="firmOffer">{item.offer}</div>
                     {item.isOpen === false && <div className="closedTag">Closed</div>}
                     <button

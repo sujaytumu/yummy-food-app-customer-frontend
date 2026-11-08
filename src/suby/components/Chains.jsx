@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Link } from 'react-router-dom';
+import { optimizeImage } from '../imageUrl'; // NEW
 
 const Chains = () => {
     const [vendorData, setVendorData] = useState([]);
@@ -55,7 +56,7 @@ const Chains = () => {
                                 aria-label={item.firmName}
                             >
                                 <div className="firmImage">
-                                    <img src={item.image} alt={item.firmName} loading="lazy" />
+                                    <img src={optimizeImage(item.image, 700)} alt={item.firmName} loading="lazy" decoding="async" />
                                 </div>
                             </Link>
                         ))}

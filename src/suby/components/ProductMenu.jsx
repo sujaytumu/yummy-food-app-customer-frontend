@@ -63,6 +63,7 @@ import {
   fetchFirmRatings, loadAddresses, saveAddress, deleteAddress,
 } from "../orderStore"; // NEW
 import OrderTracker from "./OrderTracker"; // NEW
+import { optimizeImage } from "../imageUrl"; // NEW
 import { isNativeApp, openNativeCheckout, reportPaymentFailure } from "../nativeCheckout"; // NEW: Android app payments
 
 // NEW: loads Razorpay Checkout script once
@@ -412,7 +413,7 @@ const ProductMenu = () => {
               <div className="pDesc">{item.description}</div>
             </div>
             <div className="productGroup">
-              <img src={item.image} alt={item.productName} /> {/* ✅ Cloudinary URL */}
+              <img src={optimizeImage(item.image, 300)} alt={item.productName} loading="lazy" decoding="async" /> {/* ✅ Cloudinary URL, resized */}
               {/* UPDATED: ADD button now adds to cart, shows -/qty/+ once added */}
               {isOut(item) ? (
                 <div className="addButton disabled" aria-disabled="true">Sold out</div>
