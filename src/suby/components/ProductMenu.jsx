@@ -85,6 +85,7 @@ const parsePrice = (raw) => {
 
 const ProductMenu = () => {
   const [products, setProducts] = useState([]);
+  const [popularIds, setPopularIds] = useState([]); // dishes customers order most (from the server)
   const [menuLoading, setMenuLoading] = useState(true);
 
   // NEW: cart = { [productId]: qty }, checkout form + status
@@ -120,6 +121,7 @@ const ProductMenu = () => {
       const response = await fetch(`${API_URL}/product/${firmId}/products`);
       const newProductData = await response.json();
       setProducts(newProductData.products);
+      setPopularIds(Array.isArray(newProductData.popular) ? newProductData.popular : []);
     } catch (error) {
       console.error("product failed to fetch", error);
     } finally {
@@ -395,7 +397,14 @@ const ProductMenu = () => {
         {visibleProducts.map((item, i) => (
           <div className={`productBox${isOut(item) ? " soldOut" : ""}`} key={item._id} style={{ "--i": Math.min(i, 8) }}>
             <div>
-              <div><strong>{item.productName}</strong></div>
+              <div>
+                <strong>{item.productName}</strong>
+                {popularIds.includes(item._id) ? (
+                  <span className="dishTag popularTag">Popular</span>
+                ) : item.bestSeller === true ? (
+                  <span className="dishTag bestTag">Best seller</span>
+                ) : null}
+              </div>
               {ratings.ratings[item._id] && (
                 <div className="ratingTag">★ {ratings.ratings[item._id].avg} ({ratings.ratings[item._id].count})</div>
               )}

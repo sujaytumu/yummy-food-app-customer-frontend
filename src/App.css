@@ -443,3 +443,8 @@ button.receiptDownload { font: inherit; font-weight: 800; cursor: pointer; }
 .etaBox { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 14px; padding: 12px 16px; border-radius: var(--r-ctl); background: var(--saffron-wash); text-align: center; animation: rise 0.5s var(--ease) both; }
 .etaBox strong { font-family: var(--font-display); font-size: 19px; color: var(--ink); }
 .etaBox span { font-size: 14px; color: var(--muted); }
+
+/* ---------- dish tags ---------- */
+.dishTag { display: inline-block; margin-left: 8px; padding: 2px 9px; border-radius: var(--r-pill); font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; vertical-align: middle; }
+.popularTag { background: var(--saffron); color: var(--ink); }
+.bestTag { background: var(--saffron-wash); color: #7a4500; border: 1px solid var(--saffron); }
