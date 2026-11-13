@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { FaReceipt } from 'react-icons/fa'
+import ThemeToggle from '../../theme/ThemeToggle'
 
 const TopBar = () => {
   return (
@@ -11,6 +12,7 @@ const TopBar = () => {
         </Link>
       </div>
       <div className="topBarLinks">
+        <ThemeToggle />
         <Link to="/my-orders" className="link"><FaReceipt aria-hidden="true" /> My orders</Link>
       </div>
     </section>

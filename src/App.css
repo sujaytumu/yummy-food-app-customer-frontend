@@ -7,6 +7,8 @@
    ============================================================ */
 
 :root {
+  --on-saffron: #17163a;
+  --chip: #17163a;
   --ink: #17163a;
   --ink-2: #3a3961;
   --muted: #62658a;
@@ -20,7 +22,7 @@
   --saffron: #ffa41b;
   --saffron-deep: #f08f00;
   --saffron-wash: #fff3dc;
-  --saffron-ink: #7a4500;
+  --saffron-ink: var(--saffron-ink);
   --chilli: #d92d45;
   --chilli-wash: #ffe8ec;
   --mint: #087552;
@@ -185,7 +187,7 @@ a { color: var(--indigo); }
 .firmGroup { transition: box-shadow 0.35s; }
 .firmOffer {
   position: absolute; left: 12px; bottom: 12px; padding: 5px 12px; border-radius: var(--r-pill);
-  background: var(--saffron); color: var(--ink); font-weight: 800; font-size: 13px;
+  background: var(--saffron); color: var(--on-saffron); font-weight: 800; font-size: 13px;
 }
 .firmOffer:empty { display: none; }
 .firmDetails strong { font-family: var(--font-display); font-size: 19px; font-weight: 700; letter-spacing: -0.015em; }
@@ -237,7 +239,7 @@ a { color: var(--indigo); }
 .addButton {
   position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 98px; height: 40px;
   display: grid; place-items: center; border-radius: var(--r-ctl);
-  background: var(--saffron); color: var(--ink); font-weight: 800; font-size: 14px; letter-spacing: 0.01em;
+  background: var(--saffron); color: var(--on-saffron); font-weight: 800; font-size: 14px; letter-spacing: 0.01em;
   box-shadow: 0 8px 16px -8px rgba(240, 143, 0, 0.9); user-select: none;
   transition: background 0.2s, transform 0.15s var(--ease);
 }
@@ -262,7 +264,7 @@ a { color: var(--indigo); }
 .cartBar {
   position: fixed; z-index: 40; left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); margin: 0 auto; max-width: 560px;
   display: flex; align-items: center; gap: 8px; padding: 10px 10px 10px 20px; border-radius: 22px;
-  background: var(--ink); color: #fff; box-shadow: 0 18px 40px -12px rgba(23, 22, 58, 0.7);
+  background: var(--chip); color: #fff; box-shadow: 0 18px 40px -12px rgba(23, 22, 58, 0.7);
   animation: sheetUp 0.5s var(--spring) both;
 }
 .cartBar > span { flex: 1; font-weight: 700; display: flex; flex-direction: column; line-height: 1.2; }
@@ -271,7 +273,7 @@ a { color: var(--indigo); }
 .cartBar button:active { transform: scale(0.95); }
 .cartBar .cartClear { background: transparent; color: rgba(255, 255, 255, 0.75); font-weight: 600; padding: 12px; }
 .cartBar .cartClear:hover { color: #fff; }
-.cartBar button:last-child { background: var(--saffron); color: var(--ink); }
+.cartBar button:last-child { background: var(--saffron); color: var(--on-saffron); }
 .cartBar button:last-child:hover { background: var(--saffron-deep); }
 
 /* ---------- checkout + receipt sheet ---------- */
@@ -299,7 +301,7 @@ a { color: var(--indigo); }
   color: var(--ink); font-weight: 700; text-align: center; text-decoration: none; transition: transform 0.15s var(--ease), background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 .checkoutBtns button:hover { border-color: var(--indigo); }
-.checkoutBtns button[type="submit"], .receiptDownload { background: var(--saffron); border-color: var(--saffron); color: var(--ink); font-weight: 800; }
+.checkoutBtns button[type="submit"], .receiptDownload { background: var(--saffron); border-color: var(--saffron); color: var(--on-saffron); font-weight: 800; }
 .checkoutBtns button[type="submit"]:hover, .receiptDownload:hover { background: var(--saffron-deep); border-color: var(--saffron-deep); box-shadow: 0 10px 18px -10px rgba(240, 143, 0, 0.9); }
 .checkoutBtns button:active, .receiptDownload:active { transform: scale(0.97); }
 .checkoutBtns button:disabled { opacity: 0.55; cursor: not-allowed; }
@@ -364,7 +366,7 @@ button.receiptDownload { font: inherit; font-weight: 800; cursor: pointer; }
 .reviewBox h4 { font-size: 19px; font-weight: 700; }
 .reviewRow { display: flex; flex-direction: column; gap: 8px; }
 .reviewRow textarea { min-height: 64px; resize: vertical; }
-.reviewRow button { align-self: flex-start; padding: 10px 18px; border: 0; border-radius: var(--r-ctl); background: var(--saffron); color: var(--ink); font-weight: 800; transition: transform 0.15s var(--ease), background 0.2s; }
+.reviewRow button { align-self: flex-start; padding: 10px 18px; border: 0; border-radius: var(--r-ctl); background: var(--saffron); color: var(--on-saffron); font-weight: 800; transition: transform 0.15s var(--ease), background 0.2s; }
 .reviewRow button:hover { background: var(--saffron-deep); }
 .reviewRow button:active { transform: scale(0.96); }
 .stars span { transition: transform 0.15s var(--spring), color 0.15s; display: inline-block; }
@@ -414,7 +416,7 @@ button.receiptDownload { font: inherit; font-weight: 800; cursor: pointer; }
 }
 .firmSearch:focus { outline: none; border-color: var(--indigo); box-shadow: 0 0 0 4px rgba(46, 44, 134, 0.12); }
 .firmSearch::placeholder { color: var(--muted); }
-.reorderBtn { background: var(--saffron) !important; color: var(--ink) !important; border-color: var(--saffron) !important; font-weight: 800; }
+.reorderBtn { background: var(--saffron) !important; color: var(--on-saffron) !important; border-color: var(--saffron) !important; font-weight: 800; }
 
 /* ---------- promo code ---------- */
 .promoRow { display: flex; gap: 8px; margin: 10px 0 4px; }
@@ -432,8 +434,8 @@ button.receiptDownload { font: inherit; font-weight: 800; cursor: pointer; }
 
 /* ---------- closed restaurants + special instructions ---------- */
 .link.firmClosed .firmGroup img { filter: grayscale(0.85) brightness(0.9); }
-.closedTag { position: absolute; left: 12px; bottom: 12px; padding: 5px 12px; border-radius: var(--r-pill); background: var(--ink); color: #fff; font-weight: 800; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
-.closedBanner { margin: 14px 0; padding: 14px 18px; border-radius: var(--r-ctl); background: #fde8eb; color: var(--chilli); border: 1.5px solid var(--chilli); font-size: 15px; }
+.closedTag { position: absolute; left: 12px; bottom: 12px; padding: 5px 12px; border-radius: var(--r-pill); background: var(--chip); color: #fff; font-weight: 800; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+.closedBanner { margin: 14px 0; padding: 14px 18px; border-radius: var(--r-ctl); background: var(--chilli-wash); color: var(--chilli); border: 1.5px solid var(--chilli); font-size: 15px; }
 .closedBanner strong { display: block; font-family: var(--font-display); font-size: 17px; }
 .cartBar button:disabled { opacity: 0.55; cursor: not-allowed; }
 .noteBox { resize: none; }
@@ -446,5 +448,44 @@ button.receiptDownload { font: inherit; font-weight: 800; cursor: pointer; }
 
 /* ---------- dish tags ---------- */
 .dishTag { display: inline-block; margin-left: 8px; padding: 2px 9px; border-radius: var(--r-pill); font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; vertical-align: middle; }
-.popularTag { background: var(--saffron); color: var(--ink); }
-.bestTag { background: var(--saffron-wash); color: #7a4500; border: 1px solid var(--saffron); }
+.popularTag { background: var(--saffron); color: var(--on-saffron); }
+.bestTag { background: var(--saffron-wash); color: var(--saffron-ink); border: 1px solid var(--saffron); }
+
+/* ================= dark mode ================= */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #f1f0ff;
+  --ink-2: #cfcef0;
+  --ink-soft: #cfcef0;
+  --muted: #a4a6cf;
+  --bg: #11102a;
+  --surface: #1b1a3d;
+  --line: #2f2e5c;
+  --line-2: #242349;
+  --indigo: #7471f5;
+  --indigo-deep: #5653d6;
+  --indigo-wash: #2b2a62;
+  --violet: #cdb0ff;
+  --violet-wash: #36254f;
+  --saffron-wash: #3a2a0d;
+  --saffron-wash-2: #4a3410;
+  --saffron-ink: #ffd18a;
+  --chilli: #ff7388;
+  --chilli-deep: #ff5f78;
+  --chilli-wash: #3b1824;
+  --mint: #45dba6;
+  --mint-wash: #133a2d;
+  --chip: #2c2b5e;
+  --shadow-lift: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 30px -12px rgba(0, 0, 0, 0.7);
+  --shadow-sheet: 0 -10px 40px -10px rgba(0, 0, 0, 0.7);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 28px -16px rgba(0, 0, 0, 0.7);
+}
+:root[data-theme="dark"] body { background: var(--bg); color: var(--ink); }
+:root[data-theme="dark"] input, :root[data-theme="dark"] textarea, :root[data-theme="dark"] select { background: var(--surface); color: var(--ink); }
+:root[data-theme="dark"] img { opacity: 0.92; }
+.themeToggle { display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.14); color: #fff; cursor: pointer; transition: background 0.2s, transform 0.2s; }
+.themeToggle:hover { background: rgba(255, 255, 255, 0.26); }
+.themeToggle:active { transform: scale(0.92); }
+:root[data-theme="dark"] .favBtn { background: rgba(27, 26, 61, 0.92); color: var(--ink-2); }
+:root[data-theme="dark"] .skeleton, :root[data-theme="dark"] .skeletonLine { opacity: 0.6; }
+.topBarLinks { display: flex; align-items: center; gap: 8px; }
