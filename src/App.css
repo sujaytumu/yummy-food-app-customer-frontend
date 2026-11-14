@@ -489,3 +489,15 @@ button.receiptDownload { font: inherit; font-weight: 800; cursor: pointer; }
 :root[data-theme="dark"] .favBtn { background: rgba(27, 26, 61, 0.92); color: var(--ink-2); }
 :root[data-theme="dark"] .skeleton, :root[data-theme="dark"] .skeletonLine { opacity: 0.6; }
 .topBarLinks { display: flex; align-items: center; gap: 8px; }
+
+/* Order cancellation */
+.cancelledBox { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: var(--r-ctl); background: var(--chilli-wash); }
+.cancelledBox strong { font-family: var(--font-display); font-size: 18px; color: var(--chilli); }
+.cancelledBox span { font-size: 14px; color: var(--muted); }
+.cancelOrderBtn { margin-top: 10px; padding: 9px 18px; border-radius: var(--r-pill); border: 1.5px solid var(--chilli); background: transparent; color: var(--chilli); font-family: var(--font-body); font-weight: 700; cursor: pointer; }
+.cancelOrderBtn:hover { background: var(--chilli-wash); }
+.cancelConfirm { margin-top: 10px; padding: 12px 14px; border-radius: var(--r-ctl); background: var(--chilli-wash); display: flex; flex-direction: column; gap: 10px; font-weight: 600; }
+.cancelConfirm div { display: flex; gap: 10px; flex-wrap: wrap; }
+.cancelYes { padding: 9px 16px; border-radius: var(--r-pill); border: 0; background: var(--chilli); color: #fff; font-weight: 700; cursor: pointer; }
+.cancelNo { padding: 9px 16px; border-radius: var(--r-pill); border: 1.5px solid var(--line, #ccc); background: transparent; color: inherit; font-weight: 700; cursor: pointer; }
+.cancelYes:disabled, .cancelNo:disabled { opacity: 0.6; cursor: default; }

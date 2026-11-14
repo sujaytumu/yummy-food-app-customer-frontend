@@ -9,6 +9,9 @@ const OrderTracker = ({ orderId, paymentId, onStatus }) => {
   const [now, setNow] = useState(Date.now()); // ticks so the countdown stays fresh between polls
   const [ready, setReady] = useState(false); // lets the scooter ride in from the start on first paint
   const timerRef = useRef(null);
+  const [confirming, setConfirming] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState("");
 
   const load = async () => {
     try {
@@ -23,12 +26,33 @@ const OrderTracker = ({ orderId, paymentId, onStatus }) => {
     }
   };
 
+  const cancelOrder = async () => {
+    setCancelling(true);
+    setCancelError("");
+    try {
+      const res = await fetch(`${API_URL}/payment/cancel/${orderId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pid: paymentId })
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || "Could not cancel the order");
+      setConfirming(false);
+      await load();
+    } catch (err) {
+      setCancelError(err.message);
+      load(); // the order may have moved on; refresh so the button disappears if it can no longer be cancelled
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   useEffect(() => {
     load();
     timerRef.current = setInterval(() => {
       // UPDATED: stop polling once delivered, no point hitting the server forever
       setData((cur) => {
-        if (cur?.deliveryStatus === "delivered") {
+        if (cur?.deliveryStatus === "delivered" || cur?.cancelled) {
           clearInterval(timerRef.current);
           return cur;
         }
@@ -54,6 +78,18 @@ const OrderTracker = ({ orderId, paymentId, onStatus }) => {
 
   if (error) return <div className="trackerError">Could not load order status: {error}</div>;
   if (!data) return <div className="orderTracker"><div className="skeleton" style={{ height: 84 }} /></div>;
+
+  if (data.cancelled) {
+    const rf = data.refund;
+    return (
+      <div className="orderTracker cancelledBox" role="status">
+        <strong>Order cancelled{data.cancelledBy === "vendor" ? " by the restaurant" : ""}</strong>
+        {rf && rf.status !== "failed" && <span>Your refund of ₹{Number(rf.amount).toFixed(2)} is on its way and usually reaches your account in 5–7 working days.</span>}
+        {rf && rf.status === "failed" && <span>We could not send your refund automatically. The restaurant has been asked to retry it, so please check again later.</span>}
+        {!rf && <span>No refund details yet.</span>}
+      </div>
+    );
+  }
 
   const steps = data.steps;
   const idx = Math.max(0, steps.findIndex((s) => s.status === data.deliveryStatus));
@@ -102,6 +138,19 @@ const OrderTracker = ({ orderId, paymentId, onStatus }) => {
         </div>
       )}
       <p className="trackerNow" key={data.deliveryStatus}>{data.statusLabel}</p>
+      {data.canCancel && !confirming && (
+        <button type="button" className="cancelOrderBtn" onClick={() => setConfirming(true)}>Cancel order</button>
+      )}
+      {data.canCancel && confirming && (
+        <div className="cancelConfirm" role="alertdialog" aria-label="Confirm cancellation">
+          <span>Cancel this order and get a full refund?</span>
+          <div>
+            <button type="button" className="cancelYes" onClick={cancelOrder} disabled={cancelling}>{cancelling ? "Cancelling…" : "Yes, cancel"}</button>
+            <button type="button" className="cancelNo" onClick={() => setConfirming(false)} disabled={cancelling}>Keep order</button>
+          </div>
+        </div>
+      )}
+      {cancelError && <p className="trackerError">{cancelError}</p>}
     </div>
   );
 };
